@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.902
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29503.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OctojumpProceduralGenerator", "OctojumpProceduralGenerator\OctojumpProceduralGenerator.vcxproj", "{2AD0BA1F-A30F-4092-8A40-71EC5905ED34}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OctojumpProceduralRenderer", "OctojumpProceduralRenderer\OctojumpProceduralRenderer.vcxproj", "{60A1CEC2-6756-433D-BBBC-A15E914217CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,14 @@ Global
 		{2AD0BA1F-A30F-4092-8A40-71EC5905ED34}.Release|x64.Build.0 = Release|x64
 		{2AD0BA1F-A30F-4092-8A40-71EC5905ED34}.Release|x86.ActiveCfg = Release|Win32
 		{2AD0BA1F-A30F-4092-8A40-71EC5905ED34}.Release|x86.Build.0 = Release|Win32
+		{60A1CEC2-6756-433D-BBBC-A15E914217CB}.Debug|x64.ActiveCfg = Debug|x64
+		{60A1CEC2-6756-433D-BBBC-A15E914217CB}.Debug|x64.Build.0 = Debug|x64
+		{60A1CEC2-6756-433D-BBBC-A15E914217CB}.Debug|x86.ActiveCfg = Debug|Win32
+		{60A1CEC2-6756-433D-BBBC-A15E914217CB}.Debug|x86.Build.0 = Debug|Win32
+		{60A1CEC2-6756-433D-BBBC-A15E914217CB}.Release|x64.ActiveCfg = Release|x64
+		{60A1CEC2-6756-433D-BBBC-A15E914217CB}.Release|x64.Build.0 = Release|x64
+		{60A1CEC2-6756-433D-BBBC-A15E914217CB}.Release|x86.ActiveCfg = Release|Win32
+		{60A1CEC2-6756-433D-BBBC-A15E914217CB}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
