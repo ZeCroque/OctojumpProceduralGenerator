@@ -3,6 +3,8 @@
 #include <time.h>
 #include <string>
 #include <algorithm>
+#include <iostream>
+#include "IHM.h"
 
 using namespace std;
 
@@ -94,6 +96,20 @@ int MapGenerator::getRandomPercentage()
 	return rand() / ((RAND_MAX + 1) / 100);
 }
 
+void MapGenerator::printMap()
+{
+	clearConsole();
+
+	for (int j = 0; j < this->_iSize; ++j)
+	{
+		for (int i = 0; i < this->_iSize; ++i)
+		{
+			cout << this->_iMap[i][j] << " ";
+		}
+		cout << endl;
+	}
+}
+
 void MapGenerator::generateMap()
 {
 	if (this->_bUseRandomSeed)
@@ -158,6 +174,7 @@ void MapGenerator::generateMap()
 					}*/
 
 					randomValue = this->getRandomPercentage();
+					this->printMap();
 				} while (randomValue < _iRandomDirectionPercent);
 			}
 	

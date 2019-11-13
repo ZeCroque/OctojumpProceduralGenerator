@@ -22,6 +22,7 @@ class MapGenerator
 		MapGenerator(int iSize, int iRandomFillPercent, std::string sSeed);
 		virtual ~MapGenerator();
 		MapGenerator& operator = (const MapGenerator& mg);
+		void printMap();
 		int getRandomPercentage();
 		bool horizontalRoadExistNearby(int x, int y);
 		bool verticalRoadExistNearby(int x, int y);
@@ -29,7 +30,6 @@ class MapGenerator
 		int** getMap() const;
 		int getSize() const;
 };
-
 
 
 #endif
