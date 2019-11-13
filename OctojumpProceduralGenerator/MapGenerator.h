@@ -13,7 +13,9 @@ class MapGenerator
 		int _iRandomDirectionPercent;
 		int _iRandomNewSegmentPercent;
 		int _iSegmentSize;
-		int _iSpaceBetweenRoads;
+		//int _iSpaceBetweenRoads;
+		int _iMinSpaceBetweenRoads;
+		int _iMaxSpaceBetweenRoads;
 		bool _bUseRandomSeed;
 
 	public:

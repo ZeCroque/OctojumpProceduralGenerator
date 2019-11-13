@@ -23,7 +23,7 @@
     <ProjectGuid>{2AD0BA1F-A30F-4092-8A40-71EC5905ED34}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>OctojumpProceduralGenerator</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

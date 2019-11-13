@@ -23,7 +23,7 @@
     <ProjectGuid>{60A1CEC2-6756-433D-BBBC-A15E914217CB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>OctojumProceduralRenderer</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
     <ProjectName>OctojumpProceduralRenderer</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
