@@ -4,6 +4,7 @@
 #include "framework.h"
 #include "OctojumpProceduralRenderer.h"
 #include <fstream>
+#include <iostream>
 
 #define MAX_LOADSTRING 100
 
@@ -155,7 +156,6 @@ int calculateScroll(int& pos, int max, WPARAM wParam)
 //Callback for messageHandlerThread
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	//TODO SCROLLBARS
 	switch (message)
 	{
 		case WM_CREATE:
@@ -289,6 +289,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 	RegisterClassExW(&wcex);
 
+	std::wcout << lpCmdLine << std::endl;
 	readMapFromFile(lpCmdLine);
 
 	//Creating window
