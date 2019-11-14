@@ -26,6 +26,7 @@ class MapGenerator
 		MapGenerator& operator = (const MapGenerator& mg);
 		void printMap();
 		int getRandomPercentage();
+		void joinNearbyRoads(int x, int y);
 		bool horizontalRoadExistNearby(int x, int y);
 		bool verticalRoadExistNearby(int x, int y);
 		void generateMap();

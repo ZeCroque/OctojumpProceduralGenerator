@@ -48,6 +48,33 @@ MapGenerator& MapGenerator::operator = (const MapGenerator& mg)
 	return *this;
 }
 
+void MapGenerator::joinNearbyRoads(int x, int y)
+{
+	int xMax = min(x + this->_iSegmentSize, this->_iSize);
+	int xMin = max(x - this->_iSegmentSize, 0);
+
+	for (int i = xMin; i < xMax; ++i)
+	{
+		if (!this->_iMap[i][y])
+		{
+			if (i < x)
+			{
+				for (int k = i; k < xMax; ++k)
+				{
+					this->_iMap[k][y] = 0;
+				}
+			}
+			else
+			{
+				for (int k = i; k > xMin; --k)
+				{
+					this->_iMap[k][y] = 0;
+				}
+			}
+		}
+	}
+}
+
 /*bool MapGenerator::horizontalRoadExistNearby(int x, int y)
 {
 	int yMin = max(y - this->_iSpaceBetweenRoads, 0);
@@ -203,9 +230,9 @@ void MapGenerator::generateMap()
 		}
 	}
 
-	this->_iRandomFillPercent = 5;
+	this->_iRandomFillPercent = 25;
 	//this->_iRandomDirectionPercent = 50;
-	this->_iRandomNewSegmentPercent = 50;
+	this->_iRandomNewSegmentPercent = 30;
 	this->_iSegmentSize = this->_iSize / 10;
 	this->_iMinSpaceBetweenRoads = 5;
 	this->_iMaxSpaceBetweenRoads = 10;
@@ -222,16 +249,18 @@ void MapGenerator::generateMap()
 				randomValue = this->getRandomPercentage();
 				if (randomValue < this->_iRandomFillPercent)
 				{
+					joinNearbyRoads(x, y);
 					do
 					{
 						for (int i = x; i < x + this->_iSegmentSize && i < this->_iSize; ++i)
 						{
 							this->_iMap[i][y] = 0;
+							
 						}
 						x += this->_iSegmentSize;
+						joinNearbyRoads(x, y);
 						randomValue = this->getRandomPercentage();
 					} while (x < this->_iSize && randomValue < _iRandomDirectionPercent);
-					x += this->_iSegmentSize;
 				}
 			}
 		}
