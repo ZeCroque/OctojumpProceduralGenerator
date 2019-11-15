@@ -13,6 +13,7 @@ class MapGenerator
 		//int _iRandomDirectionPercent;
 		//int _iRandomNewSegmentPercent;
 		int _iMinRoadSize;
+		int _iRoadExtensionRange;
 		int _iSpaceBetweenRoads;
 		int _iMinSpaceFromBorder;
 		//int _iMaxSpaceBetweenRoads;
