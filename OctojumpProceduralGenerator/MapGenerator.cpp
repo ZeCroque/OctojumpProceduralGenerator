@@ -17,7 +17,7 @@ MapGenerator::MapGenerator(int iSize, int iRandomFillPercent) : _iSize(iSize), _
 		this->_iMap[i] = new int[_iSize];
 		for (int j = 0; j < _iSize; ++j)
 		{
-			this->_iMap[i][j] = 0;
+			this->_iMap[i][j] = 1;
 		}
 	}
 }
@@ -48,147 +48,95 @@ MapGenerator& MapGenerator::operator = (const MapGenerator& mg)
 	return *this;
 }
 
-void MapGenerator::joinNearbyRoads(int x, int y)
+bool MapGenerator::rightRoadExistNearby(int x, int y, int iEndLine)
 {
-	int xMax = min(x + this->_iSegmentSize, this->_iSize);
-	int xMin = max(x - this->_iSegmentSize, 0);
+	int yMin = (std::clamp(y - this->_iSpaceBetweenRoads, 0, this->_iSize-1));
+	int yMax = (std::clamp(y + this->_iSpaceBetweenRoads, 0, this->_iSize-1));
 
-	for (int i = xMin; i < xMax; ++i)
+	for (int i = yMin; i < yMax; ++i)
 	{
-		if (!this->_iMap[i][y])
+		int lastY = -1;
+		for (int j = x; j < iEndLine; ++j)
 		{
-			if (i < x)
+			if (!this->_iMap[y][j] && !lastY)
 			{
-				for (int k = i; k < xMax; ++k)
-				{
-					this->_iMap[k][y] = 0;
-				}
+				return true;
 			}
-			else
-			{
-				for (int k = i; k > xMin; --k)
-				{
-					this->_iMap[k][y] = 0;
-				}
-			}
+			lastY = this->_iMap[y][j];
 		}
 	}
+	return false;
 }
 
-/*bool MapGenerator::horizontalRoadExistNearby(int x, int y)
+bool MapGenerator::leftRoadExistNearby(int x, int y, int iEndLine)
 {
 	int yMin = max(y - this->_iSpaceBetweenRoads, 0);
 	int yMax = min(y + this->_iSpaceBetweenRoads, this->_iSize);
 
-	int xMax = min(x + this->_iSegmentSize, this->_iSize);
-	int xMin = max(x - this->_iSegmentSize, 0);
-
 	for (int j = yMin; j < yMax; ++j)
-	{		
-		int previousValue = -1;
-		for (int i = x; i < xMax; ++i)
+	{
+		int last = -1;
+		for (int i = x; i > iEndLine; --i)
 		{
-			if (!previousValue && !this->_iMap[i][j])
+			if (!this->_iMap[i][j] && !last)
 			{
-				if (j == y)
-				{
-					for (int k = x; k < xMax; ++k)
-					{
-						this->_iMap[k][j] = 0;
-					}
-				}
-				else
-				{
-					return true;
-				}				
+				return true;
 			}
-
-			previousValue = this->_iMap[i][j];
-		}
-		previousValue = -1;
-		for (int i = x; i > xMin; --i)
-		{
-			if (!previousValue && !this->_iMap[i][j])
-			{
-				if (j == y)
-				{
-					for (int k = x; k > xMin; --k)
-					{
-						this->_iMap[k][j] = 0;
-					}
-				}
-				else
-				{
-					return true;
-				}
-				
-			}
-
-			previousValue = this->_iMap[i][j];
+			last = this->_iMap[i][j];
 		}
 	}
 	return false;
 }
 
-bool MapGenerator::verticalRoadExistNearby(int x, int y)
+bool MapGenerator::upRoadExistNearby(int x, int y, int iEndLine)
 {
 	int xMin = max(x - this->_iSpaceBetweenRoads, 0);
 	int xMax = min(x + this->_iSpaceBetweenRoads, this->_iSize);
 
-	int yMax = min(y + this->_iSegmentSize, this->_iSize);
-	int yMin = max(y - this->_iSegmentSize, 0);
-
 	for (int i = xMin; i < xMax; ++i)
 	{
-		int previousValue = -1;
-		for (int j = y; j < yMax; ++j)
+		int last = -1;
+		for (int j = y; j > iEndLine; --j)
 		{
-			if (!previousValue && !this->_iMap[i][j])
+			if (!this->_iMap[i][j] && !last)
 			{
-				if (i == x)
-				{
-					for (int k = y; k < yMax; ++k)
-					{
-						this->_iMap[i][k] = 0;
-					}
-				}
-				else
-				{
-					return true;
-				}
+				return true;
 			}
-
-			previousValue = this->_iMap[i][j];
-		}
-		previousValue = -1;
-		for (int j = y; j > yMin; --j)
-		{
-			if (!previousValue && !this->_iMap[i][j])
-			{
-				if (i == x)
-				{
-					for (int k = y; k > yMin; --k)
-					{
-						this->_iMap[i][k] = 0;
-					}
-				}
-				else
-				{
-					return true;
-				}
-
-			}
-
-			previousValue = this->_iMap[i][j];
+			last = this->_iMap[i][j];
 		}
 	}
 	return false;
-}*/
+}
+
+bool MapGenerator::downRoadExistNearby(int x, int y, int iEndLine)
+{
+	int xMin = max(x - this->_iSpaceBetweenRoads, 0);
+	int xMax = min(x + this->_iSpaceBetweenRoads, this->_iSize);
+
+	for (int i = xMin; i < xMax; ++i)
+	{
+		int lastY = -1;
+		for (int j = y; j < iEndLine; ++j)
+		{
+			if (!this->_iMap[i][j] && !lastY)
+			{
+				return true;
+			}
+			lastY = this->_iMap[i][j];
+		}
+	}
+	return false;
+}
 
 
 int MapGenerator::getRandomPercentage()
 {
 	return rand() / ((RAND_MAX + 1) / 100);
+}
+
+int randInt(int min, int max)
+{
+	return min + rand() % (max - min + 1);
 }
 
 void MapGenerator::printMap()
@@ -210,107 +158,75 @@ void MapGenerator::generateMap()
 	if (this->_bUseRandomSeed)
 	{
 		char tmp[80] = { 0 };
-		time_t rawtime=time(nullptr);
+		time_t rawtime = time(nullptr);
 		tm timeinfo;
 		localtime_s(&timeinfo, &rawtime);
-		strftime(tmp, sizeof(tmp), "%c",&timeinfo);
+		strftime(tmp, sizeof(tmp), "%c", &timeinfo);
 		this->_sSeed = string(tmp);
 	}
 
 	hash<string> hHash;
 	size_t stringHash = hHash(this->_sSeed);
-	srand((unsigned int) stringHash);
-	int randomValue=0;
+	srand((unsigned int)stringHash);
+	int randomValue = 0;
 
-	for (int x = 0; x < this->_iSize; ++x)
+	this->_iRandomFillPercent = 25;
+	this->_iSpaceBetweenRoads = 5;
+	this->_iMinSpaceFromBorder = (int)(0.10 * this->_iSize);
+	this->_iMinRoadSize = (int)(0.10 * this->_iSize);
+
+	for (float i = 0; i < (int)(0.5 * this->_iSize); i += this->newCrossline()); //TODO make setting
+}
+
+float MapGenerator::newCrossline()
+{
+	int x = randInt(this->_iMinSpaceFromBorder, (this->_iSize - this->_iMinSpaceFromBorder));
+	int y = randInt(this->_iMinSpaceFromBorder, (this->_iSize - this->_iMinSpaceFromBorder));
+
+	float iCrossroadCounts = 0;
+	int iEndLine;/* = clamp((int)(this->_iSize * 0.8) + randInt((int)-(this->_iSize * 0.2), (this->_iSize * 0.1)), x + this->_iMinRoadSize, this->_iSize - 1);
+
+	if (!this->rightRoadExistNearby(x, y, iEndLine))
 	{
-		for (int y = 0; y < this->_iSize; ++y)
+		iCrossroadCounts += 0.25;
+		for (int i = x ; i < iEndLine; ++i)
 		{
-			this->_iMap[x][y] = 1;
+			this->_iMap[y][i] = 0;
+		}
+	}*/
+
+	iEndLine = min(y + (int)(this->_iSize * 0.6) + randInt(0, (this->_iSize * 0.3)), this->_iSize);
+	if (!this->downRoadExistNearby(x, y, iEndLine))
+	{
+		iCrossroadCounts += 0.25;
+		for (int i = y; i < iEndLine; ++i)
+		{
+			this->_iMap[x][i] = 0;
 		}
 	}
 
-	this->_iRandomFillPercent = 25;
-	//this->_iRandomDirectionPercent = 50;
-	this->_iRandomNewSegmentPercent = 30;
-	this->_iSegmentSize = this->_iSize / 10;
-	this->_iMinSpaceBetweenRoads = 5;
-	this->_iMaxSpaceBetweenRoads = 10;
-
-	int y=0;
-	do
+	iEndLine = max(x - (int)(this->_iSize * 0.6) + randInt(0, (this->_iSize * 0.3)), this->_iMinSpaceFromBorder);
+	if (!this->leftRoadExistNearby(x, y, iEndLine))
 	{
-		y+=rand() % (this->_iMinSpaceBetweenRoads - this->_iMaxSpaceBetweenRoads) + this->_iMaxSpaceBetweenRoads;
-
-		if (y < this->_iSize)
+		iCrossroadCounts += 0.25;
+		for (int i = x; i > iEndLine; --i)
 		{
-			for (int x = 0; x < this->_iSize; ++x)
-			{
-				randomValue = this->getRandomPercentage();
-				if (randomValue < this->_iRandomFillPercent)
-				{
-					joinNearbyRoads(x, y);
-					do
-					{
-						for (int i = x; i < x + this->_iSegmentSize && i < this->_iSize; ++i)
-						{
-							this->_iMap[i][y] = 0;
-							
-						}
-						x += this->_iSegmentSize;
-						joinNearbyRoads(x, y);
-						randomValue = this->getRandomPercentage();
-					} while (x < this->_iSize && randomValue < _iRandomDirectionPercent);
-				}
-			}
+			this->_iMap[i][y] = 0;
 		}
-	} while (y < this->_iSize);
+	}
 
-	/*for (int x = 0; x < this->_iSize; ++x)
+	iEndLine = max(y - (int)(this->_iSize * 0.6) + randInt(0, (this->_iSize * 0.3)), this->_iMinSpaceFromBorder);
+	if (!this->upRoadExistNearby(x, y, iEndLine))
 	{
-		for (int y = 0; y < this->_iSize; ++y)
+		iCrossroadCounts += 0.25;
+		for (int i = y; i > iEndLine; --i)
 		{
-			if (this->_iMap[x][y])
-			{
-				randomValue = this->getRandomPercentage();
-				if (randomValue < this->_iRandomFillPercent)
-				{
-					bool bDirection; //0:H, 1:V
-
-					randomValue = this->getRandomPercentage();
-					bDirection = true;//randomValue < _iRandomDirectionPercent;
-					int xTmp = x;
-					int yTmp = y;
-					do
-					{
-						if (bDirection && !horizontalRoadExistNearby(xTmp, y))
-						{
-							//Horizontal
-							for (int i = xTmp; i < xTmp + this->_iSegmentSize && i < this->_iSize; ++i)
-							{
-								this->_iMap[i][y] = 0;
-							}
-							xTmp += this->_iSegmentSize;
-						}
-						else if (!bDirection && !verticalRoadExistNearby(x, yTmp))
-						{
-							//Vertical
-							for (int i = yTmp; i < yTmp +this->_iSegmentSize && i < this->_iSize; ++i)
-							{
-								this->_iMap[x][i] = 0;
-							}
-							yTmp += this->_iSegmentSize;
-						}
-
-						randomValue = this->getRandomPercentage();
-						//this->printMap();
-					} while (xTmp <= this->_iSize && yTmp <= this->_iSize && randomValue < _iRandomDirectionPercent);
-				}
-			}	
+			this->_iMap[x][i] = 0;
 		}
-	}*/
+	}
+	return iCrossroadCounts;
 }
-
+	
 int** MapGenerator::getMap() const
 {
 	return this->_iMap;

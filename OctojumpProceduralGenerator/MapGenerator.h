@@ -10,12 +10,12 @@ class MapGenerator
 		int** _iMap;
 		std::string _sSeed;
 		int _iRandomFillPercent;
-		int _iRandomDirectionPercent;
-		int _iRandomNewSegmentPercent;
-		int _iSegmentSize;
-		//int _iSpaceBetweenRoads;
-		int _iMinSpaceBetweenRoads;
-		int _iMaxSpaceBetweenRoads;
+		//int _iRandomDirectionPercent;
+		//int _iRandomNewSegmentPercent;
+		int _iMinRoadSize;
+		int _iSpaceBetweenRoads;
+		int _iMinSpaceFromBorder;
+		//int _iMaxSpaceBetweenRoads;
 		bool _bUseRandomSeed;
 
 	public:
@@ -26,9 +26,11 @@ class MapGenerator
 		MapGenerator& operator = (const MapGenerator& mg);
 		void printMap();
 		int getRandomPercentage();
-		void joinNearbyRoads(int x, int y);
-		bool horizontalRoadExistNearby(int x, int y);
-		bool verticalRoadExistNearby(int x, int y);
+		bool rightRoadExistNearby(int x, int y, int iEndLine);
+		bool leftRoadExistNearby(int x, int y, int iEndLine);
+		bool upRoadExistNearby(int x, int y, int iEndLine);
+		bool downRoadExistNearby(int x, int y, int iEndLine);
+		float newCrossline();
 		void generateMap();
 		int** getMap() const;
 		int getSize() const;
