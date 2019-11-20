@@ -2,6 +2,8 @@
 #define MAP_GENERATOR__H
 
 #include <string>
+#include <algorithm>
+#include "Rectangle.h"
 
 class MapGenerator
 {
@@ -10,31 +12,44 @@ class MapGenerator
 		int** _iMap;
 		std::string _sSeed;
 		int _iRandomFillPercent;
-		//int _iRandomDirectionPercent;
-		//int _iRandomNewSegmentPercent;
 		int _iMinRoadSize;
 		int _iRoadExtensionRange;
 		int _iSpaceBetweenRoads;
 		int _iMinSpaceFromBorder;
-		//int _iMaxSpaceBetweenRoads;
+		int _iBuildingMaxHeight;
 		bool _bUseRandomSeed;
 
 	public:
-		MapGenerator() : _iSize(0), _iRandomFillPercent(0), _sSeed(std::string()), _bUseRandomSeed(false), _iMap(nullptr){}
-		MapGenerator(int iSize, int iRandomFillPercent);
-		MapGenerator(int iSize, int iRandomFillPercent, std::string sSeed);
+		//FORME CANONIQUE DE COPLIEN
+		MapGenerator();
 		virtual ~MapGenerator();
 		MapGenerator& operator = (const MapGenerator& mg);
-		void printMap();
-		int getRandomPercentage();
+
+		//CONSTRUCTEURS SURCHARGES
+		MapGenerator(int iSize, int iRandomFillPercent);
+		MapGenerator(int iSize, int iRandomFillPercent, std::string sSeed);
+
+		//GETTERS/SETTERS
+		int** getMap() const;
+		int getSize() const;
+
+		//INITIALIZER
+		void generateMap();
+
+		//ROADS GENERATION
+		float newCrossline();
 		bool rightRoadExistNearby(int x, int y, int iEndLine);
 		bool leftRoadExistNearby(int x, int y, int iEndLine);
 		bool upRoadExistNearby(int x, int y, int iEndLine);
 		bool downRoadExistNearby(int x, int y, int iEndLine);
-		float newCrossline();
-		void generateMap();
-		int** getMap() const;
-		int getSize() const;
+
+		//BUILDINGS GENERATION
+		void placeBuildings();
+		Rectangle findSquare(int x, int y);
+		void fillRectangle(Rectangle rect);
+
+		//DEBUG
+		void printMap(int x, int y, int xEnd, int yEnd);
 };
 
 

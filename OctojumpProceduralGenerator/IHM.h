@@ -9,5 +9,6 @@ int askSize();
 void askForPathAndSave(int** iMap, int iSize);
 void clearConsole(char fill = ' ');
 void debug();
+void setConsoleColor(int color);
 
 #endif

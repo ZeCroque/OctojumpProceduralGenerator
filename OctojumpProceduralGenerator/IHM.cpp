@@ -18,6 +18,12 @@ void writeTitle(string s)
 	writeDisclaimer();
 }
 
+void setConsoleColor(int color)
+{
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	SetConsoleTextAttribute(hConsole, color);
+}
+
 void clearConsole(char fill)
 {
 	COORD tl = { 0,0 };
@@ -76,7 +82,7 @@ int askWhatToDoNext()
 	int iInput;
 	bool bInputInRange;
 
-	clearConsole();
+	//clearConsole();
 	writeTitle("Octojump Procedural Test");
 	cout << "Would you like to :\n[0]Generate again\n[1]Save generated city to file\n[2]Quit" << endl;
 	do
@@ -134,7 +140,6 @@ void debug()
 	{
 		askForPathAndSave(mg->getMap(), iSize);
 	}
-
 	if (mg != nullptr)
 	{
 		delete mg;

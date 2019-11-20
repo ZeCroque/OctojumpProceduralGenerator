@@ -157,6 +157,7 @@
     <ClInclude Include="IO.h" />
     <ClInclude Include="MapGenerator.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Rectangle.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IHM.cpp" />
