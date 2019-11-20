@@ -265,7 +265,6 @@ void MapGenerator::placeBuildings()
 				if (this->_iMap[x][y] == -1)
 				{
 					Rectangle currentRect = findSquare(x, y);
-					printMap(currentRect._xOrigin, currentRect._yOrigin, currentRect._xEnd, currentRect._yEnd);
 					fillRectangle(currentRect);
 					bSquareFound = true;
 					break;
@@ -273,6 +272,7 @@ void MapGenerator::placeBuildings()
 			}
 		}
 	} while (bSquareFound);
+	printMap(0,0,0,0);
 }
 
 Rectangle MapGenerator::findSquare(int x, int y)
@@ -369,6 +369,8 @@ void MapGenerator::fillRectangle(Rectangle rect)
 		delete[] rectangleWFCMatrix[j];
 	}
 	delete[] rectangleWFCMatrix;
+
+
 }
 
 /*======================================
@@ -431,7 +433,7 @@ void MapGenerator::printMap(int x, int y, int xEnd, int yEnd)
 			}
 			else if (this->_iMap[i][j] > 0)
 			{
-				setConsoleColor(2);
+				setConsoleColor(4);
 			}
 
 			if (this->_iMap[i][j] >= 0 && this->_iMap[i][j] < 10)
@@ -448,3 +450,4 @@ void MapGenerator::printMap(int x, int y, int xEnd, int yEnd)
 		cout << endl;
 	}
 }
+
