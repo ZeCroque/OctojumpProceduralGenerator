@@ -72,7 +72,7 @@ int MapGenerator::getSize() const {
 ========================================*/
 int MapGenerator::randInt(int min, int max) {
     std::uniform_int_distribution<int> dist(min, max);
-    return dist(this->_generator) ;
+    return dist(*(this->_generator));
 }
 
 /*======================================
@@ -81,12 +81,10 @@ int MapGenerator::randInt(int min, int max) {
 void MapGenerator::generateMap() {
     if (this->_bUseRandomSeed) {
         std::random_device rd;
-        this->_generator = new std::mt19937(rd);
-    }
-    else
-    {
+        this->_generator = new std::mt19937(rd());
+    } else {
         std::seed_seq seed(this->_sSeed.begin(), this->_sSeed.end());
-         this->_generator = new std::mt19937(seed);
+        this->_generator = new std::mt19937(seed);
     }
 
     //DEBUG
@@ -251,7 +249,7 @@ Rectangle MapGenerator::findSquare(int x, int y) {
     return Rectangle(x, y, xSquareEnd, ySquareEnd);
 }
 
-void MapGenerator::fillRectangle(const Rectangle& rect) {
+void MapGenerator::fillRectangle(const Rectangle &rect) {
     int iWidth = rect._xEnd - rect._xOrigin + 2;
     int iHeight = rect._yEnd - rect._yOrigin + 2;
 
