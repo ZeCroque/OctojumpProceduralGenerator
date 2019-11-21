@@ -204,8 +204,18 @@ float MapGenerator::newCrossline() {
 
     float iCrossroadCounts = 0;
 
-    for (int i = 1; i <= 4; i++) {
-        iCrossroadCounts += this->newRoad(x, y, road_width, i);
+    std::vector<int> indexes;
+    indexes.resize(4);
+
+    for (unsigned int i = 0; i < indexes.size(); i++) {
+        indexes[i]=i+1;
+    }
+
+    for (unsigned int i = 0; i < 4; i++) {
+        int iRandIndex=this->randInt(0, indexes.size()-1);
+        cout<<iRandIndex<<endl;
+        iCrossroadCounts += this->newRoad(x, y, road_width, indexes[iRandIndex]);
+        indexes.erase(indexes.begin() + iRandIndex);
     }
 
     return iCrossroadCounts;
