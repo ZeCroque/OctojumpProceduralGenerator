@@ -75,19 +75,22 @@ int MapGenerator::randInt(int min, int max) {
     return dist(*(this->_generator));
 }
 
+void getShape(){
+    
+}
+
 /*======================================
 =============INITIALIZER===========
 ========================================*/
 void MapGenerator::generateMap() {
-	if (this->_bUseRandomSeed)
-	{
-		char tmp[80] = { 0 };
-		time_t rawtime = time(nullptr);
-		tm timeinfo;
-		localtime_s(&timeinfo, &rawtime);
-		strftime(tmp, sizeof(tmp), "%c", &timeinfo);
-		this->_sSeed = string(tmp);
-	}
+    if (this->_bUseRandomSeed) {
+        char tmp[80] = {0};
+        time_t rawtime = time(nullptr);
+        tm timeinfo;
+        localtime_s(&timeinfo, &rawtime);
+        strftime(tmp, sizeof(tmp), "%c", &timeinfo);
+        this->_sSeed = string(tmp);
+    }
 
     std::seed_seq seed(this->_sSeed.begin(), this->_sSeed.end());
     this->_generator = new std::mt19937(seed);
@@ -204,18 +207,24 @@ float MapGenerator::newCrossline() {
 
     float iCrossroadCounts = 0;
 
-    std::vector<int> indexes;
-    indexes.resize(4);
+    int stack[4] = {1, 2, 3, 4};
+    int trash[4];
+    int rnd;
+    bool tmp;
 
-    for (unsigned int i = 0; i < indexes.size(); i++) {
-        indexes[i]=i+1;
-    }
-
-    for (unsigned int i = 0; i < 4; i++) {
-        int iRandIndex=this->randInt(0, indexes.size()-1);
-        cout<<iRandIndex<<endl;
-        iCrossroadCounts += this->newRoad(x, y, road_width, indexes[iRandIndex]);
-        indexes.erase(indexes.begin() + iRandIndex);
+    for (int i = 0; i < 4;) {
+        rnd = stack[randInt(0, 3)];
+        tmp = false;
+        for (int j : trash) {
+            if (rnd == j) {
+                tmp = true;
+            }
+        }
+        if (!tmp) {
+            iCrossroadCounts += this->newRoad(x, y, road_width, rnd);
+            trash[i] = rnd;
+            i++;
+        }
     }
 
     return iCrossroadCounts;
