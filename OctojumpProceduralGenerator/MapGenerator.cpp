@@ -79,13 +79,18 @@ int MapGenerator::randInt(int min, int max) {
 =============INITIALIZER===========
 ========================================*/
 void MapGenerator::generateMap() {
-    if (this->_bUseRandomSeed) {
-        std::random_device rd;
-        this->_generator = new std::mt19937(rd());
-    } else {
-        std::seed_seq seed(this->_sSeed.begin(), this->_sSeed.end());
-        this->_generator = new std::mt19937(seed);
-    }
+	if (this->_bUseRandomSeed)
+	{
+		char tmp[80] = { 0 };
+		time_t rawtime = time(nullptr);
+		tm timeinfo;
+		localtime_s(&timeinfo, &rawtime);
+		strftime(tmp, sizeof(tmp), "%c", &timeinfo);
+		this->_sSeed = string(tmp);
+	}
+
+    std::seed_seq seed(this->_sSeed.begin(), this->_sSeed.end());
+    this->_generator = new std::mt19937(seed);
 
     //DEBUG
     this->_iRandomFillPercent = 25;
