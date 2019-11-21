@@ -12,8 +12,8 @@ private:
     int **_iMap;
     std::string _sSeed;
     int _iRandomFillPercent;
-    int _iMinRoadSize{};
-    int _iRoadExtensionRange{};
+    float _fMinRoadSize{};
+    float _fMaxRoadSize{};
     int _iSpaceBetweenRoads{};
     int _iMinSpaceFromBorder{};
     int _iBuildingMaxHeight{};
@@ -23,6 +23,8 @@ private:
 public:
     //FORME CANONIQUE DE COPLIEN
     MapGenerator();
+
+    void pixelDiscover(int x, int y);
 
     virtual ~MapGenerator();
 
@@ -44,13 +46,10 @@ public:
     //ROADS GENERATION
     float newCrossline();
 
-    bool rightRoadExistNearby(int x, int y, int iEndLine);
+    float newRoad(int x, int y, int road_width, int direction);
 
-    bool leftRoadExistNearby(int x, int y, int iEndLine);
+    bool roadExistNearby(int a, int b, int iEndLine, bool vertical = false);
 
-    bool upRoadExistNearby(int x, int y, int iEndLine);
-
-    bool downRoadExistNearby(int x, int y, int iEndLine);
 
     //BUILDINGS GENERATION
     void placeBuildings();
@@ -61,6 +60,7 @@ public:
 
     //DEBUG
     void printMap(int x, int y, int xEnd, int yEnd);
+
     int randInt(int min, int max);
 };
 

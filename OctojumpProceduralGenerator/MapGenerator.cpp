@@ -91,121 +91,119 @@ void MapGenerator::generateMap() {
     this->_iRandomFillPercent = 25;
     this->_iSpaceBetweenRoads = 5;
     this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.1);
-    this->_iMinRoadSize = (int) (this->_iSize * 0.6);
-    this->_iRoadExtensionRange = (int) (this->_iSize * 0.3);
+    this->_fMinRoadSize = 0.60;
+    this->_fMaxRoadSize = 0.90;
     this->_iBuildingMaxHeight = 9;
 
-    for (float i = 0; i < (0.1 * this->_iSize); i += this->newCrossline());//TODO make setting
+    for (float i = 0; i < (0.2 * this->_iSize);) {
+        i += this->newCrossline();
+    }//TODO make setting
 
+    for (int x = 0; x < this->_iSize; x++) {
+        for (int y = 0; y < this->_iSize; ++y) {
+            if (this->_iMap[x][y] == -2) {
+                this->_iMap[x][y] = 0;
+            }
+        }
+    }
     placeBuildings();
 }
 
 /*======================================
 =============ROAD GENERATION============
 ========================================*/
+bool MapGenerator::roadExistNearby(int a, int b, int iEndLine, bool vertical) {
+    if (iEndLine < a) {
+        int tmp = iEndLine;
+        iEndLine = a;
+        a = tmp;
+    }
+    int bMin = max(b - this->_iSpaceBetweenRoads, 0);
+    int bMax = min(b + this->_iSpaceBetweenRoads, this->_iSize);
+
+    for (int j = bMin; j < bMax; ++j) {
+        int last = -1;
+        for (int i = a; i < iEndLine; ++i) {
+            if (!vertical) {
+                if (!this->_iMap[i][j] && !last) {
+                    return true;
+                }
+                last = this->_iMap[i][j];
+            } else {
+                if (!this->_iMap[j][i] && !last) {
+                    return true;
+                }
+                last = this->_iMap[j][i];
+            }
+        }
+    }
+    return false;
+}
+
+float MapGenerator::newRoad(int x, int y, int road_width, int direction) {
+    int a, b;
+    int iEndLine;
+    int vertical;
+    if (direction == 1 || direction == 3) {
+        a = x;
+        b = y;
+        vertical = false;
+    } else {
+        a = y;
+        b = x;
+        vertical = true;
+    }
+    if (direction == 1 || direction == 2) {
+        iEndLine = randInt(a + (int) (float(this->_iSize - a) * this->_fMinRoadSize),
+                           a + (int) (float(this->_iSize - a) * this->_fMaxRoadSize));
+    } else {
+        iEndLine = a - randInt((int) ((float) a * this->_fMinRoadSize), (int) ((float) a * this->_fMaxRoadSize));
+    }
+
+    int road_value;
+    if (!this->roadExistNearby(a, b, iEndLine, vertical)) {
+        int new_b = max(b - road_width, 0);
+        int bMax = min(b + road_width, this->_iSize);
+        if (a > iEndLine) {
+            int tmp = iEndLine;
+            iEndLine = a;
+            a = tmp;
+        }
+
+        do {
+            if (new_b == b) {
+                road_value = 0;
+            } else {
+                road_value = -2;
+            }
+            if (!vertical) {
+                for (int i = a; i < iEndLine; ++i) {
+                    this->_iMap[i][new_b] = road_value;
+                }
+            } else {
+                for (int i = a; i < iEndLine; ++i) {
+                    this->_iMap[new_b][i] = road_value;
+                }
+            }
+            ++new_b;
+        } while (new_b < bMax);
+        return 0.25;
+    }
+    return 0;
+}
+
 float MapGenerator::newCrossline() {
     int x = this->randInt(this->_iMinSpaceFromBorder, (this->_iSize - this->_iMinSpaceFromBorder));
     int y = this->randInt(this->_iMinSpaceFromBorder, (this->_iSize - this->_iMinSpaceFromBorder));
+    int road_width = randInt(0, 1);
 
     float iCrossroadCounts = 0;
 
-    int iEndLine = min(x + this->_iMinRoadSize + this->randInt(0, this->_iRoadExtensionRange), this->_iSize);
-    if (!this->rightRoadExistNearby(x, y, iEndLine)) {
-        iCrossroadCounts += 0.25;
-        for (int i = x; i < iEndLine; ++i) {
-            this->_iMap[i][y] = 0;
-        }
-    }
-
-    iEndLine = min(y + this->_iMinRoadSize + this->randInt(0, this->_iRoadExtensionRange), this->_iSize);
-    if (!this->downRoadExistNearby(x, y, iEndLine)) {
-        iCrossroadCounts += 0.25;
-        for (int i = y; i < iEndLine; ++i) {
-            this->_iMap[x][i] = 0;
-        }
-    }
-
-    iEndLine = max(x - this->_iMinRoadSize - this->randInt(0, this->_iRoadExtensionRange), -1);
-    if (!this->leftRoadExistNearby(x, y, iEndLine)) {
-        iCrossroadCounts += 0.25;
-        for (int i = x; i > iEndLine; --i) {
-            this->_iMap[i][y] = 0;
-        }
-    }
-
-    iEndLine = max(y - this->_iMinRoadSize - this->randInt(0, this->_iRoadExtensionRange), -1);
-    if (!this->upRoadExistNearby(x, y, iEndLine)) {
-        iCrossroadCounts += 0.25;
-        for (int i = y; i > iEndLine; --i) {
-            this->_iMap[x][i] = 0;
-        }
+    for (int i = 1; i <= 4; i++) {
+        iCrossroadCounts += this->newRoad(x, y, road_width, i);
     }
 
     return iCrossroadCounts;
-}
-
-bool MapGenerator::rightRoadExistNearby(int x, int y, int iEndLine) {
-    int yMin = max(y - this->_iSpaceBetweenRoads, 0);
-    int iRowYMax = min(y + this->_iSpaceBetweenRoads, this->_iSize);
-
-    for (int j = yMin; j < iRowYMax; ++j) {
-        int last = -1;
-        for (int i = x; i < iEndLine; ++i) {
-            if (!this->_iMap[i][j] && !last) {
-                return true;
-            }
-            last = this->_iMap[i][j];
-        }
-    }
-    return false;
-}
-
-bool MapGenerator::downRoadExistNearby(int x, int y, int iEndLine) {
-    int xMin = max(x - this->_iSpaceBetweenRoads, 0);
-    int xMax = min(x + this->_iSpaceBetweenRoads, this->_iSize);
-
-    for (int i = xMin; i < xMax; ++i) {
-        int last = -1;
-        for (int j = y; j < iEndLine; ++j) {
-            if (!this->_iMap[i][j] && !last) {
-                return true;
-            }
-            last = this->_iMap[i][j];
-        }
-    }
-    return false;
-}
-
-bool MapGenerator::leftRoadExistNearby(int x, int y, int iEndLine) {
-    int yMin = max(y - this->_iSpaceBetweenRoads, 0);
-    int iRowYMax = min(y + this->_iSpaceBetweenRoads, this->_iSize);
-
-    for (int j = yMin; j < iRowYMax; ++j) {
-        int last = -1;
-        for (int i = x; i > iEndLine; --i) {
-            if (!this->_iMap[i][j] && !last) {
-                return true;
-            }
-            last = this->_iMap[i][j];
-        }
-    }
-    return false;
-}
-
-bool MapGenerator::upRoadExistNearby(int x, int y, int iEndLine) {
-    int xMin = max(x - this->_iSpaceBetweenRoads, 0);
-    int xMax = min(x + this->_iSpaceBetweenRoads, this->_iSize);
-
-    for (int i = xMin; i < xMax; ++i) {
-        int last = -1;
-        for (int j = y; j > iEndLine; --j) {
-            if (!this->_iMap[i][j] && !last) {
-                return true;
-            }
-            last = this->_iMap[i][j];
-        }
-    }
-    return false;
 }
 
 
