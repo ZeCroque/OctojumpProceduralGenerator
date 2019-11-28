@@ -24,6 +24,7 @@ SCROLLINFO si;
 //Data
 int** iMap = nullptr;
 int iSize;
+float fGreyScaleCoeff;
 
 void readMapFromFile(LPWSTR path)
 {	
@@ -50,10 +51,26 @@ void readMapFromFile(LPWSTR path)
 	}
 }
 
+void getMaxHeight()
+{
+	int iLastHeight = 0;
+	for (int j = 0; j < iSize; ++j)
+	{
+		for (int i = 0 ; i < iSize; ++i)
+		{
+			if (iMap[i][j] > iLastHeight)
+			{
+				iLastHeight = iMap[i][j];
+			}
+		}
+	}
+	fGreyScaleCoeff = 255/((float)iLastHeight);
+}
+
 void drawRoads()
 {
 	PAINTSTRUCT ps;
-	HBRUSH black = CreateSolidBrush(RGB(0, 0, 0));
+	HBRUSH brush;
 	RECT rect;
 
 	HDC hdc = BeginPaint(hWnd, &ps);
@@ -74,10 +91,13 @@ void drawRoads()
 		{
 			for (i = gridX, x = scrollRect.left; i < xMax; ++i, x += 5)
 			{
-				if (iMap[i][j])
+				int currentValue = iMap[i][j];
+				if (currentValue>0)
 				{
 					rect = { x, y, x + 5, y + 5 };
-					FillRect(hdc, &rect, black);
+					int iGrey = 255 - currentValue * fGreyScaleCoeff;
+					brush = CreateSolidBrush(RGB(iGrey, iGrey, iGrey));
+					FillRect(hdc, &rect, brush);
 				}
 			}
 		}
@@ -90,10 +110,13 @@ void drawRoads()
 		{
 			for (int i = 0; i < iSize; ++i)
 			{
-				if (iMap[i][j])
+				int currentValue = iMap[i][j];
+				if (currentValue>0)
 				{
 					rect = { i * 5, j * 5, (i + 1) * 5, (j + 1) * 5 };
-					FillRect(hdc, &rect, black);
+					int iGrey = 255 - currentValue * fGreyScaleCoeff;
+					brush = CreateSolidBrush(RGB(iGrey, iGrey, iGrey));
+					FillRect(hdc, &rect, brush);
 				}
 			}
 		}
@@ -289,8 +312,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 	RegisterClassExW(&wcex);
 
-	std::wcout << lpCmdLine << std::endl;
 	readMapFromFile(lpCmdLine);
+	getMaxHeight();
 
 	//Creating window
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW | WS_HSCROLL | WS_VSCROLL, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
