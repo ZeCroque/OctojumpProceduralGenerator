@@ -53,9 +53,9 @@ MapGenerator::MapGenerator(int iSize, int iRandomFillPercent) : _iSize(iSize), _
         }
     }
 
-    this->_iHeatMap = new int *[_iSize];
+    this->_iHeatMap = new float *[_iSize];
     for (int i = 0; i < _iSize; ++i) {
-        this->_iHeatMap[i] = new int[_iSize];
+        this->_iHeatMap[i] = new float[_iSize];
         for (int j = 0; j < _iSize; ++j) {
             this->_iHeatMap[i][j] = -1;
         }
@@ -135,6 +135,8 @@ void MapGenerator::generateMap() {
     }
 
     this->MakeHeatMap();
+    this->MakeHeatMap();
+    this->MakeHeatMap();
 
     //this->FloodFill(0, 0);
 
@@ -146,17 +148,23 @@ float distPoint(int a, int b, int x, int y) {
 }
 
 void MapGenerator::MakeHeatMap() {
-    int a = this->randInt(75, 75) - 1;
-    int b = this->randInt(75, 75) - 1;
+    int a = this->randInt(int(this->_iSize * 0.30), (this->_iSize - int(this->_iSize * 0.30))) - 1;
+    int b = this->randInt(int(this->_iSize * 0.30), (this->_iSize - int(this->_iSize * 0.30))) - 1;
 
-    float max_distance = (distPoint(a, b, 0, 0) + distPoint(a, b, 0, 150) +
-                          distPoint(a, b, 150, 0) + distPoint(a, b, 150, 150)) / 4;
-    int heat;
+    float max_distance = min({distPoint(a, b, 0, 0), distPoint(a, b, 0, this->_iSize), distPoint(a, b, this->_iSize, 0),
+                              distPoint(a, b, this->_iSize, this->_iSize)});
+
+    float heat;
     for (int x = 0; x < this->_iSize; ++x) {
         for (int y = 0; y < this->_iSize; ++y) {
-            heat = abs(int(((float) this->_iBuildingMaxHeight * distPoint(a, b, x, y)) / max_distance) -
-                       this->_iBuildingMaxHeight);
-            this->_iHeatMap[x][y] = (int) heat;
+            heat = abs((((float) this->_iBuildingMaxHeight * distPoint(a, b, x, y)) / max_distance) -
+                       (float) this->_iBuildingMaxHeight);
+            if (this->_iHeatMap[x][y] == -1) {
+                this->_iHeatMap[x][y] = fmax(1, heat);
+            } else {
+                this->_iHeatMap[x][y] = float(this->_iHeatMap[x][y] + fmax(1, heat)) / 2;
+            }
+
         }
     }
 }
@@ -375,13 +383,22 @@ Rectangle MapGenerator::findSquare(int x, int y) {
 }
 
 void MapGenerator::fillRectangle(const Rectangle &rect) {
+    float heat = 0;
+    float i = 0;
+
     for (int y = rect._yOrigin; y < rect._yEnd; ++y) {
-       for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
-           this->_iMap[x][y]=1;
-       }
+        for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
+            i++;
+            heat += this->_iHeatMap[x][y];
+        }
     }
+    heat = heat / i;
 
-
+    for (int y = rect._yOrigin; y < rect._yEnd; ++y) {
+        for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
+            this->_iMap[x][y] = int(round(this->_iHeatMap[x][y]));
+        }
+    }
 
 
 }

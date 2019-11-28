@@ -10,7 +10,7 @@ class MapGenerator {
 private:
     int _iSize;
     int **_iMap;
-    int **_iHeatMap;
+    float **_iHeatMap;
     std::string _sSeed;
     int _iRandomFillPercent;
     float _fMinRoadSize{};
