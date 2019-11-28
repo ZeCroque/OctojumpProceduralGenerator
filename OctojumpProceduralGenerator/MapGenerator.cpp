@@ -110,7 +110,7 @@ void MapGenerator::generateMap() {
     this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.05);
     this->_fMinRoadSize = 0.60; // 60
     this->_fMaxRoadSize = 0.90; // 90
-    this->_iBuildingMaxHeight = 9;
+    this->_iBuildingMaxHeight = 255;
 
     for (float i = 0; i < (0.2 * this->_iSize);) {
         i += this->newCrossline();
@@ -134,22 +134,24 @@ void MapGenerator::generateMap() {
         }
     }
 
-    this->MakeHeatMap();
-    this->MakeHeatMap();
-    this->MakeHeatMap();
-
-    //this->FloodFill(0, 0);
+    for (int i = 0; i < 3; i++) {
+        this->MakeHeatMap();
+    }
 
     placeBuildings();
 }
 
+
+/*======================================
+=================TOOLS==================
+========================================*/
 float distPoint(int a, int b, int x, int y) {
     return float(sqrt(pow(a - x, 2) + pow(b - y, 2)));
 }
 
 void MapGenerator::MakeHeatMap() {
-    int a = this->randInt(int(this->_iSize * 0.30), (this->_iSize - int(this->_iSize * 0.30))) - 1;
-    int b = this->randInt(int(this->_iSize * 0.30), (this->_iSize - int(this->_iSize * 0.30))) - 1;
+    int a = this->randInt(int(this->_iSize * 0.40), (this->_iSize - int(this->_iSize * 0.40))) - 1;
+    int b = this->randInt(int(this->_iSize * 0.40), (this->_iSize - int(this->_iSize * 0.40))) - 1;
 
     float max_distance = min({distPoint(a, b, 0, 0), distPoint(a, b, 0, this->_iSize), distPoint(a, b, this->_iSize, 0),
                               distPoint(a, b, this->_iSize, this->_iSize)});
@@ -169,15 +171,6 @@ void MapGenerator::MakeHeatMap() {
     }
 }
 
-void MapGenerator::FloodFill(int x, int y, int old_color, int new_color) {
-    if (this->_iMap[x][y] == old_color) {
-        this->_iMap[x][y] = new_color;
-        this->FloodFill(x + 1, y, old_color, new_color);
-        this->FloodFill(x, y + 1, old_color, new_color);
-        this->FloodFill(x - 1, y, old_color, new_color);
-        this->FloodFill(x, y - 1, old_color, new_color);
-    }
-}
 
 /*======================================
 =============ROAD GENERATION============
@@ -363,7 +356,7 @@ void MapGenerator::placeBuildings() {
             }
         }
     } while (bSquareFound);
-    printMap();
+    // printMap();
 }
 
 Rectangle MapGenerator::findSquare(int x, int y) {
@@ -396,7 +389,9 @@ void MapGenerator::fillRectangle(const Rectangle &rect) {
 
     for (int y = rect._yOrigin; y < rect._yEnd; ++y) {
         for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
-            this->_iMap[x][y] = int(round(this->_iHeatMap[x][y]));
+            this->_iMap[x][y] =
+                    (int(heat) * 2 + int(this->_iHeatMap[x][y]) + (int(this->_iHeatMap[x][y]) + randInt(-15, 15))) /
+                    4;
         }
     }
 
