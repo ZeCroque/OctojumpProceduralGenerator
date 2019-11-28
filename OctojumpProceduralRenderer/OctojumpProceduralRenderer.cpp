@@ -24,7 +24,7 @@ SCROLLINFO si;
 //Data
 int** iMap = nullptr;
 int iSize;
-float fGreyScaleCoeff;
+int fGreyScaleCoeff;
 
 void readMapFromFile(LPWSTR path)
 {	
@@ -51,26 +51,27 @@ void readMapFromFile(LPWSTR path)
 	}
 }
 
-void getMaxHeight()
+void getCoeff()
 {
-	int iLastHeight = 0;
+	int iMaxHeight = 0;
+
 	for (int j = 0; j < iSize; ++j)
 	{
-		for (int i = 0 ; i < iSize; ++i)
+		for (int i = 0; i < iSize; ++i)
 		{
-			if (iMap[i][j] > iLastHeight)
+			if (iMap[i][j] > iMaxHeight)
 			{
-				iLastHeight = iMap[i][j];
+				iMaxHeight = iMap[i][j];
 			}
 		}
 	}
-	fGreyScaleCoeff = 255/((float)iLastHeight);
+
+	fGreyScaleCoeff = 255 / ((float)iMaxHeight);
 }
 
 void drawRoads()
 {
 	PAINTSTRUCT ps;
-	HBRUSH brush;
 	RECT rect;
 
 	HDC hdc = BeginPaint(hWnd, &ps);
@@ -92,12 +93,13 @@ void drawRoads()
 			for (i = gridX, x = scrollRect.left; i < xMax; ++i, x += 5)
 			{
 				int currentValue = iMap[i][j];
-				if (currentValue>0)
+				if (currentValue)
 				{
+					int greyScale = 255 - currentValue * fGreyScaleCoeff;
+					HBRUSH brush = CreateSolidBrush(RGB(greyScale, greyScale, greyScale));
 					rect = { x, y, x + 5, y + 5 };
-					int iGrey = 255 - currentValue * fGreyScaleCoeff;
-					brush = CreateSolidBrush(RGB(iGrey, iGrey, iGrey));
 					FillRect(hdc, &rect, brush);
+					DeleteObject(brush);
 				}
 			}
 		}
@@ -111,12 +113,13 @@ void drawRoads()
 			for (int i = 0; i < iSize; ++i)
 			{
 				int currentValue = iMap[i][j];
-				if (currentValue>0)
+				if (currentValue)
 				{
+					int greyScale = 255 - currentValue * fGreyScaleCoeff;
+					HBRUSH brush = CreateSolidBrush(RGB(greyScale, greyScale, greyScale));
 					rect = { i * 5, j * 5, (i + 1) * 5, (j + 1) * 5 };
-					int iGrey = 255 - currentValue * fGreyScaleCoeff;
-					brush = CreateSolidBrush(RGB(iGrey, iGrey, iGrey));
 					FillRect(hdc, &rect, brush);
+					DeleteObject(brush);
 				}
 			}
 		}
@@ -313,7 +316,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	RegisterClassExW(&wcex);
 
 	readMapFromFile(lpCmdLine);
-	getMaxHeight();
+	getCoeff();
 
 	//Creating window
 	hWnd = CreateWindow(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW | WS_HSCROLL | WS_VSCROLL, CW_USEDEFAULT, 0, CW_USEDEFAULT, 0, NULL, NULL, hInstance, NULL);
