@@ -2,6 +2,8 @@
   IHM.cpp
   IO.cpp
   MapGenerator.cpp
+D:\CLionProject\OctojumpProceduralGenerator\OctojumpProceduralGenerator\MapGenerator.cpp(99,31): warning C4305: '=' : troncation de 'double' à 'float'
   OctojumpProceduralGenerator.cpp
   Génération de code en cours...
-  OctojumpProceduralGenerator.vcxproj -> f:\Users\GCROQUEFER\Documents\Visual Studio 2019\OctojumpProceduralGenerator\x64\Debug\OctojumpProceduralGenerator.exe
+D:\CLionProject\OctojumpProceduralGenerator\OctojumpProceduralGenerator\MapGenerator.cpp(100,31): warning C4305: '=' : troncation de 'double' à 'float'
+  OctojumpProceduralGenerator.vcxproj -> D:\CLionProject\OctojumpProceduralGenerator\x64\Debug\OctojumpProceduralGenerator.exe

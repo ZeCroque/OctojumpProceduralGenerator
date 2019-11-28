@@ -16,13 +16,18 @@ using namespace std;
 ======FORME CANONIQUE DE COPLIEN======
 ========================================*/
 MapGenerator::MapGenerator() : _iSize(0), _iRandomFillPercent(0), _sSeed(std::string()), _bUseRandomSeed(false),
-                               _iMap(nullptr) {}
+                               _iMap(nullptr), _iHeatMap(nullptr) {}
 
 MapGenerator::~MapGenerator() {
     for (int i = 0; i < this->_iSize; ++i) {
         delete[] this->_iMap[i];
     }
     delete[] this->_iMap;
+
+    for (int i = 0; i < this->_iSize; ++i) {
+        delete[] this->_iHeatMap[i];
+    }
+    delete[] this->_iHeatMap;
 }
 
 MapGenerator &MapGenerator::operator=(const MapGenerator &mg) {
@@ -41,11 +46,18 @@ MapGenerator &MapGenerator::operator=(const MapGenerator &mg) {
 MapGenerator::MapGenerator(int iSize, int iRandomFillPercent) : _iSize(iSize), _iRandomFillPercent(iRandomFillPercent),
                                                                 _sSeed(string()), _bUseRandomSeed(true) {
     this->_iMap = new int *[_iSize];
-
     for (int i = 0; i < _iSize; ++i) {
         this->_iMap[i] = new int[_iSize];
         for (int j = 0; j < _iSize; ++j) {
             this->_iMap[i][j] = -1;
+        }
+    }
+
+    this->_iHeatMap = new int *[_iSize];
+    for (int i = 0; i < _iSize; ++i) {
+        this->_iHeatMap[i] = new int[_iSize];
+        for (int j = 0; j < _iSize; ++j) {
+            this->_iHeatMap[i][j] = -1;
         }
     }
 }
@@ -75,9 +87,6 @@ int MapGenerator::randInt(int min, int max) {
     return dist(*(this->_generator));
 }
 
-void getShape(){
-    
-}
 
 /*======================================
 =============INITIALIZER===========
@@ -98,9 +107,9 @@ void MapGenerator::generateMap() {
     //DEBUG
     this->_iRandomFillPercent = 25;
     this->_iSpaceBetweenRoads = 5;
-    this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.1);
-    this->_fMinRoadSize = 0.60;
-    this->_fMaxRoadSize = 0.90;
+    this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.05);
+    this->_fMinRoadSize = 0.60; // 60
+    this->_fMaxRoadSize = 0.90; // 90
     this->_iBuildingMaxHeight = 9;
 
     for (float i = 0; i < (0.2 * this->_iSize);) {
@@ -114,7 +123,52 @@ void MapGenerator::generateMap() {
             }
         }
     }
+
+
+    for (int i = 0; i < this->_iSize; i++) {  //Make border
+        for (int y = 0; y < 3; y++) {
+            this->_iMap[i][y] = 0;
+            this->_iMap[y][i] = 0;
+            this->_iMap[i][this->_iSize - 1 - y] = 0;
+            this->_iMap[this->_iSize - 1 - y][i] = 0;
+        }
+    }
+
+    this->MakeHeatMap();
+
+    //this->FloodFill(0, 0);
+
     placeBuildings();
+}
+
+float distPoint(int a, int b, int x, int y) {
+    return float(sqrt(pow(a - x, 2) + pow(b - y, 2)));
+}
+
+void MapGenerator::MakeHeatMap() {
+    int a = this->randInt(75, 75) - 1;
+    int b = this->randInt(75, 75) - 1;
+
+    float max_distance = (distPoint(a, b, 0, 0) + distPoint(a, b, 0, 150) +
+                          distPoint(a, b, 150, 0) + distPoint(a, b, 150, 150)) / 4;
+    int heat;
+    for (int x = 0; x < this->_iSize; ++x) {
+        for (int y = 0; y < this->_iSize; ++y) {
+            heat = abs(int(((float) this->_iBuildingMaxHeight * distPoint(a, b, x, y)) / max_distance) -
+                       this->_iBuildingMaxHeight);
+            this->_iHeatMap[x][y] = (int) heat;
+        }
+    }
+}
+
+void MapGenerator::FloodFill(int x, int y, int old_color, int new_color) {
+    if (this->_iMap[x][y] == old_color) {
+        this->_iMap[x][y] = new_color;
+        this->FloodFill(x + 1, y, old_color, new_color);
+        this->FloodFill(x, y + 1, old_color, new_color);
+        this->FloodFill(x - 1, y, old_color, new_color);
+        this->FloodFill(x, y - 1, old_color, new_color);
+    }
 }
 
 /*======================================
@@ -148,9 +202,57 @@ bool MapGenerator::roadExistNearby(int a, int b, int iEndLine, bool vertical) {
     return false;
 }
 
+int MapGenerator::getIEndLine(int iEndLine, int a, int b, bool vertical) {
+    int min = 1;
+    int max = NULL;
+    int end = this->_iSize - 1;
+
+    if (a > iEndLine) {
+        end = a;
+        a = 1;
+    }
+
+    max = end;
+    if (!vertical) {
+        for (int i = a; i < end; ++i) {
+            if (this->_iMap[i][b] == 0 && i < iEndLine) {
+                min = i;
+            } else if (this->_iMap[i][b] == 0 && i > iEndLine) {
+                max = i;
+                break;
+            }
+        }
+    } else {
+        for (int i = a; i < end; ++i) {
+            if (this->_iMap[b][i] == 0 && i < iEndLine) {
+                min = i;
+            } else if (this->_iMap[b][i] == 0 && i > iEndLine) {
+                max = i;
+                break;
+            }
+        }
+    }
+
+    int result;
+    if (end != 1) {
+        if (iEndLine - min <= max - iEndLine) {
+            result = min;
+        } else {
+            result = max;
+        }
+    } else {
+        if (min - iEndLine <= iEndLine - max) {
+            result = min;
+        } else {
+            result = max;
+        }
+    }
+    return result;
+}
+
 float MapGenerator::newRoad(int x, int y, int road_width, int direction) {
     int a, b;
-    int iEndLine;
+    int tmp_iEndLine;
     int vertical;
     if (direction == 1 || direction == 3) {
         a = x;
@@ -162,12 +264,13 @@ float MapGenerator::newRoad(int x, int y, int road_width, int direction) {
         vertical = true;
     }
     if (direction == 1 || direction == 2) {
-        iEndLine = randInt(a + (int) (float(this->_iSize - a) * this->_fMinRoadSize),
-                           a + (int) (float(this->_iSize - a) * this->_fMaxRoadSize));
+        tmp_iEndLine = randInt(a + (int) (float(this->_iSize - a) * this->_fMinRoadSize),
+                               a + (int) (float(this->_iSize - a) * this->_fMaxRoadSize));
     } else {
-        iEndLine = a - randInt((int) ((float) a * this->_fMinRoadSize), (int) ((float) a * this->_fMaxRoadSize));
+        tmp_iEndLine = a - randInt((int) ((float) a * this->_fMinRoadSize), (int) ((float) a * this->_fMaxRoadSize));
     }
-
+    int iEndLine = this->getIEndLine(tmp_iEndLine, a, b, vertical);
+    a = this->getIEndLine(a, tmp_iEndLine, b, vertical);
     int road_value;
     if (!this->roadExistNearby(a, b, iEndLine, vertical)) {
         int new_b = max(b - road_width, 0);
@@ -252,7 +355,7 @@ void MapGenerator::placeBuildings() {
             }
         }
     } while (bSquareFound);
-    printMap(0, 0, 0, 0);
+    printMap();
 }
 
 Rectangle MapGenerator::findSquare(int x, int y) {
@@ -272,61 +375,13 @@ Rectangle MapGenerator::findSquare(int x, int y) {
 }
 
 void MapGenerator::fillRectangle(const Rectangle &rect) {
-    int iWidth = rect._xEnd - rect._xOrigin + 2;
-    int iHeight = rect._yEnd - rect._yOrigin + 2;
-
-    int **rectangleWFCMatrix = new int *[iHeight];
-    for (int i = 0; i < iHeight; ++i) {
-        rectangleWFCMatrix[i] = new int[iWidth];
-        for (int j = 0; j < iWidth; ++j) {
-            if (j == 0 || j == iWidth - 1 || i == 0 || i == iHeight - 1) {
-                rectangleWFCMatrix[i][j] = 0;
-            } else {
-                rectangleWFCMatrix[i][j] = -1;
-            }
-        }
+    for (int y = rect._yOrigin; y < rect._yEnd; ++y) {
+       for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
+           this->_iMap[x][y]=1;
+       }
     }
 
 
-    for (int j = 1; j < iHeight - 1; ++j) {
-        for (int i = 1; i < iWidth - 1; ++i) {
-            int iRoadSurroundingCount = 0;
-            if (rectangleWFCMatrix[j - 1][i] == 0) {
-                ++iRoadSurroundingCount;
-            }
-            if (rectangleWFCMatrix[j + 1][i] == 0) {
-                ++iRoadSurroundingCount;
-            }
-            if (rectangleWFCMatrix[j][i - 1] == 0) {
-                ++iRoadSurroundingCount;
-            }
-            if (rectangleWFCMatrix[j][i + 1] == 0) {
-                ++iRoadSurroundingCount;
-            }
-            if (iRoadSurroundingCount > 2) {
-                rectangleWFCMatrix[j][i] = 1;
-            } else {
-                int value = -2;
-                if (this->randInt(0, 1)) {
-                    value = this->randInt(1, this->_iBuildingMaxHeight);
-                }
-                rectangleWFCMatrix[j][i] = value;
-            }
-
-        }
-        cout << endl;
-    }
-
-    for (int j = rect._yOrigin, l = 1; j < rect._yEnd; ++j, ++l) {
-        for (int i = rect._xOrigin, k = 1; i < rect._xEnd; ++i, k++) {
-            this->_iMap[i][j] = rectangleWFCMatrix[l][k];
-        }
-    }
-
-    for (int j = 0; j < iHeight; ++j) {
-        delete[] rectangleWFCMatrix[j];
-    }
-    delete[] rectangleWFCMatrix;
 
 
 }
@@ -334,54 +389,23 @@ void MapGenerator::fillRectangle(const Rectangle &rect) {
 /*======================================
 ==================DEBUG=================
 ========================================*/
-void MapGenerator::printMap(int x, int y, int xEnd, int yEnd) {
+void MapGenerator::printMap() {
     clearConsole();
 
     for (int j = 0; j < this->_iSize; ++j) {
-        if (j == 0) {
-            for (int i = 0; i < this->_iSize; ++i) {
-                if (i == 0) {
-                    cout << "   ";
-                }
-                if (i < 10) {
-                    cout << "+" << i << " ";
-                } else {
-                    cout << i << " ";
-                }
-            }
-            cout << endl;
-        }
         for (int i = 0; i < this->_iSize; ++i) {
-            if (i == 0) {
-                if (j < 10) {
-                    cout << "+" << j << " ";
-                } else {
-                    cout << j << " ";
-                }
-            }
-            if (i >= x && i < xEnd && j >= y && j < yEnd) {
-                setConsoleColor(4);
-            } else {
-                setConsoleColor(15);
-            }
+
 
             if (this->_iMap[i][j] == 0) {
                 setConsoleColor(1);
-            } else if (this->_iMap[i][j] == -2) {
-                setConsoleColor(3);
             } else if (this->_iMap[i][j] > 0) {
                 setConsoleColor(4);
             }
 
-            if (this->_iMap[i][j] >= 0 && this->_iMap[i][j] < 10) {
-                cout << "+" << this->_iMap[i][j] << " ";
-            } else {
-                cout << this->_iMap[i][j] << " ";
-            }
-
+            cout << this->_iMap[i][j] << " ";
         }
-        setConsoleColor(15);
         cout << endl;
     }
+    setConsoleColor(15);
 }
 
