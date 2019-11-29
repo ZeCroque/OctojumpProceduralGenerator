@@ -110,7 +110,7 @@ void MapGenerator::generateMap() {
     this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.05);
     this->_fMinRoadSize = 0.60; // 60
     this->_fMaxRoadSize = 0.90; // 90
-    this->_iBuildingMaxHeight = 255;
+    this->_iBuildingMaxHeight = 100;
 
     for (float i = 0; i < (0.2 * this->_iSize);) {
         i += this->newCrossline();

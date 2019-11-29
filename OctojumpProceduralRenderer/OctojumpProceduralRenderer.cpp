@@ -24,7 +24,7 @@ SCROLLINFO si;
 //Data
 int** iMap = nullptr;
 int iSize;
-int fGreyScaleCoeff;
+float fGreyScaleCoeff;
 
 void readMapFromFile(LPWSTR path)
 {	
@@ -66,7 +66,7 @@ void getCoeff()
 		}
 	}
 
-	fGreyScaleCoeff = 255 / ((float)iMaxHeight);
+	fGreyScaleCoeff = 255.0f / ((float)iMaxHeight);
 }
 
 void drawRoads()
@@ -95,7 +95,7 @@ void drawRoads()
 				int currentValue = iMap[i][j];
 				if (currentValue)
 				{
-					int greyScale = 255 - currentValue * fGreyScaleCoeff;
+					int greyScale = 255 - ((int)currentValue * fGreyScaleCoeff);
 					HBRUSH brush = CreateSolidBrush(RGB(greyScale, greyScale, greyScale));
 					rect = { x, y, x + 5, y + 5 };
 					FillRect(hdc, &rect, brush);
@@ -115,7 +115,7 @@ void drawRoads()
 				int currentValue = iMap[i][j];
 				if (currentValue)
 				{
-					int greyScale = 255 - currentValue * fGreyScaleCoeff;
+					int greyScale = 255 - ((int)currentValue * fGreyScaleCoeff);
 					HBRUSH brush = CreateSolidBrush(RGB(greyScale, greyScale, greyScale));
 					rect = { i * 5, j * 5, (i + 1) * 5, (j + 1) * 5 };
 					FillRect(hdc, &rect, brush);
