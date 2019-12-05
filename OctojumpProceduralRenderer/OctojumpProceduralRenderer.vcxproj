@@ -152,12 +152,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Console.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="IO.h" />
     <ClInclude Include="OctojumpProceduralRenderer.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\OctojumpProceduralGenerator\Console.cpp" />
+    <ClCompile Include="IO.cpp" />
     <ClCompile Include="OctojumpProceduralRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
