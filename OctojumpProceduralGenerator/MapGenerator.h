@@ -12,7 +12,7 @@ private:
     int **_iMap;
     float **_iHeatMap;
     std::string _sSeed;
-    int _iRandomFillPercent;
+    float _iRandomFillPercent;
     float _fMinRoadSize{};
     float _fMaxRoadSize{};
     int _iSpaceBetweenRoads{};
@@ -24,25 +24,22 @@ private:
 public:
     //FORME CANONIQUE DE COPLIEN
     MapGenerator();
-    void boundaryFill4(int x, int y, int fill_color, int boundary_color);
     virtual ~MapGenerator();
     MapGenerator &operator=(const MapGenerator &mg);
 
     //CONSTRUCTEURS SURCHARGES
-    MapGenerator(int iSize, int iRandomFillPercent);
-    MapGenerator(int iSize, int iRandomFillPercent, std::string sSeed);
+    MapGenerator(int iSize, float iRandomFillPercent);
+    MapGenerator(int iSize, float iRandomFillPercent, std::string sSeed);
 
 
 
     //GETTERS/SETTERS
     int **getMap() const;
-    int getSize() const;
 
     //INITIALIZER
     void generateMap();
 
     //TOOLS
-    void FloodFill(int x, int y, int old_color = -1, int new_color = 0);
     void MakeHeatMap();
 
     //ROADS GENERATION
@@ -57,7 +54,7 @@ public:
     void fillRectangle(const Rectangle &rect);
 
     //DEBUG
-    void printMap();
+    // void printMap();
     int randInt(int min, int max);
 };
 
