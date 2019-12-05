@@ -43,8 +43,9 @@ MapGenerator &MapGenerator::operator=(const MapGenerator &mg) {
 /*======================================
 ========CONSTRUCTEURS SURCHARGES========
 ========================================*/
-MapGenerator::MapGenerator(int iSize, int iRandomFillPercent) : _iSize(iSize), _iRandomFillPercent(iRandomFillPercent),
-                                                                _sSeed(string()), _bUseRandomSeed(true) {
+MapGenerator::MapGenerator(int iSize, float iRandomFillPercent) : _iSize(iSize),
+                                                                  _iRandomFillPercent(iRandomFillPercent),
+                                                                  _sSeed(string()), _bUseRandomSeed(true) {
     this->_iMap = new int *[_iSize];
     for (int i = 0; i < _iSize; ++i) {
         this->_iMap[i] = new int[_iSize];
@@ -62,8 +63,8 @@ MapGenerator::MapGenerator(int iSize, int iRandomFillPercent) : _iSize(iSize), _
     }
 }
 
-MapGenerator::MapGenerator(int iSize, int iRandomFillPercent, std::string sSeed) : MapGenerator(iSize,
-                                                                                                iRandomFillPercent) {
+MapGenerator::MapGenerator(int iSize, float iRandomFillPercent, std::string sSeed) : MapGenerator(iSize,
+                                                                                                  iRandomFillPercent) {
     this->_bUseRandomSeed = false;
     this->_sSeed = std::move(sSeed);
 }
@@ -75,9 +76,6 @@ int **MapGenerator::getMap() const {
     return this->_iMap;
 }
 
-int MapGenerator::getSize() const {
-    return this->_iSize;
-}
 
 /*======================================
 =============UTILITIES===========
@@ -95,7 +93,7 @@ void MapGenerator::generateMap() {
     if (this->_bUseRandomSeed) {
         char tmp[80] = {0};
         time_t rawtime = time(nullptr);
-        tm timeinfo;
+        tm timeinfo{};
         localtime_s(&timeinfo, &rawtime);
         strftime(tmp, sizeof(tmp), "%c", &timeinfo);
         this->_sSeed = string(tmp);
@@ -105,14 +103,16 @@ void MapGenerator::generateMap() {
     this->_generator = new std::mt19937(seed);
 
     //DEBUG
-    this->_iRandomFillPercent = 25;
-    this->_iSpaceBetweenRoads = 5;
+    this->_iRandomFillPercent = 0.2;
+    this->_iBuildingMaxHeight = 35;
+    this->_iSpaceBetweenRoads = 4;
+
     this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.05);
     this->_fMinRoadSize = 0.60; // 60
     this->_fMaxRoadSize = 0.90; // 90
-    this->_iBuildingMaxHeight = 100;
 
-    for (float i = 0; i < (0.2 * this->_iSize);) {
+
+    for (float i = 0; i < this->_iRandomFillPercent * (float) this->_iSize;) {
         i += this->newCrossline();
     }//TODO make setting
 
@@ -390,8 +390,9 @@ void MapGenerator::fillRectangle(const Rectangle &rect) {
     for (int y = rect._yOrigin; y < rect._yEnd; ++y) {
         for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
             this->_iMap[x][y] =
-                    (int(heat) * 2 + int(this->_iHeatMap[x][y]) + (int(this->_iHeatMap[x][y]) + randInt(-15, 15))) /
-                    4;
+                    (int(heat) * 2 +
+                     int(this->_iHeatMap[x][y]) +
+                     (int(this->_iHeatMap[x][y]) + randInt(-2, 2))) / 4;
         }
     }
 
@@ -401,23 +402,23 @@ void MapGenerator::fillRectangle(const Rectangle &rect) {
 /*======================================
 ==================DEBUG=================
 ========================================*/
-void MapGenerator::printMap() {
-    clearConsole();
-
-    for (int j = 0; j < this->_iSize; ++j) {
-        for (int i = 0; i < this->_iSize; ++i) {
-
-
-            if (this->_iMap[i][j] == 0) {
-                setConsoleColor(1);
-            } else if (this->_iMap[i][j] > 0) {
-                setConsoleColor(4);
-            }
-
-            cout << this->_iMap[i][j] << " ";
-        }
-        cout << endl;
-    }
-    setConsoleColor(15);
-}
+//void MapGenerator::printMap() {
+//    clearConsole();
+//
+//    for (int j = 0; j < this->_iSize; ++j) {
+//        for (int i = 0; i < this->_iSize; ++i) {
+//
+//
+//            if (this->_iMap[i][j] == 0) {
+//                setConsoleColor(1);
+//            } else if (this->_iMap[i][j] > 0) {
+//                setConsoleColor(4);
+//            }
+//
+//            cout << this->_iMap[i][j] << " ";
+//        }
+//        cout << endl;
+//    }
+//    setConsoleColor(15);
+//}
 
