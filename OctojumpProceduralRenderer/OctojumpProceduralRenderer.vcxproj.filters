@@ -27,6 +27,12 @@
     <ClInclude Include="OctojumpProceduralRenderer.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="IO.h">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="small.ico">
@@ -38,6 +44,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OctojumpProceduralRenderer.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="..\OctojumpProceduralGenerator\Console.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="IO.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,6 +5,9 @@
 #include "OctojumpProceduralRenderer.h"
 #include <fstream>
 #include <iostream>
+#include "Console.h"
+#include "IO.h"
+
 
 #define MAX_LOADSTRING 100
 
@@ -135,8 +138,8 @@ int calculateScroll(int& pos, int max, WPARAM wParam)
 	int delta;
 
 	switch (LOWORD(wParam))
-	{
-		// User clicked the scroll bar shaft above the scroll box. 
+	{		
+		// User clicked the scroll bar shaft above the scroll box.
 	case SB_PAGEUP:
 		newPos = pos - 50;
 		break;
@@ -260,6 +263,24 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				si.nPos = yCurrentScroll;
 				SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
 			}
+			break;
+		}
+		case WM_LBUTTONDOWN:
+		{
+			int x = GET_X_LPARAM(lParam)/5 + xCurrentScroll/5;
+			int y = GET_Y_LPARAM(lParam)/5 + yCurrentScroll/5;
+			if (x < 150 && y < 150)
+			{
+				RedirectIOToConsole();
+				iMap[x][y]=readIntFromKB();
+				CloseConsole();
+			}
+			bScroll = true;
+			RECT clientRect;
+			GetClientRect(hWnd, &clientRect);
+			InvalidateRect(hWnd, &clientRect, true);
+
+			
 			break;
 		}
 		case WM_COMMAND:
