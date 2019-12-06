@@ -343,7 +343,6 @@ void MapGenerator::placeBuildings() {
 
     do {
         bSquareFound = false;
-
         //Sets up rectangle detection origin
         for (int y = 0; y < this->_iSize && !bSquareFound; ++y) {
             for (int x = 0; x < this->_iSize; ++x) {
@@ -389,7 +388,7 @@ void MapGenerator::fillRectangle(const Rectangle &rect) {
 
     for (int y = rect._yOrigin; y < rect._yEnd; ++y) {
         for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
-            this->_iMap[x][y] = min(1, (int(heat) * 2 +
+            this->_iMap[x][y] = max(1, (int(heat) * 2 +
                                         int(this->_iHeatMap[x][y]) +
                                         (int(this->_iHeatMap[x][y]) + randInt(-2, 2))) / 4);
         }
