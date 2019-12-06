@@ -389,10 +389,9 @@ void MapGenerator::fillRectangle(const Rectangle &rect) {
 
     for (int y = rect._yOrigin; y < rect._yEnd; ++y) {
         for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
-            this->_iMap[x][y] =
-                    (int(heat) * 2 +
-                     int(this->_iHeatMap[x][y]) +
-                     (int(this->_iHeatMap[x][y]) + randInt(-2, 2))) / 4;
+            this->_iMap[x][y] = min(1, (int(heat) * 2 +
+                                        int(this->_iHeatMap[x][y]) +
+                                        (int(this->_iHeatMap[x][y]) + randInt(-2, 2))) / 4);
         }
     }
 
