@@ -124,12 +124,12 @@ void debug()
 		switch (iUsrChoice)
 		{
 		case 0:
-			mg = new MapGenerator(iSize, 50);
+			mg = new MapGenerator(iSize, 50, 35, 4);
 			break;
 		case 1:
 			cout << "Please enter your seed:" << endl;
 			cin >> sUsrSeed;
-			mg = new MapGenerator(iSize, 50, sUsrSeed);
+			mg = new MapGenerator(iSize, 50, 35, 4, sUsrSeed);
 			break;
 		}
 		mg->generateMap();

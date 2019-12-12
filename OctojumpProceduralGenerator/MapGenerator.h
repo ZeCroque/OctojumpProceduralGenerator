@@ -28,8 +28,8 @@ public:
     MapGenerator &operator=(const MapGenerator &mg);
 
     //CONSTRUCTEURS SURCHARGES
-    MapGenerator(int iSize, float iRandomFillPercent);
-    MapGenerator(int iSize, float iRandomFillPercent, std::string sSeed);
+    MapGenerator(int iSize, float iRandomFillPercent, int iBuildingMaxHeight, int iSpaceBetweenRoads);
+    MapGenerator(int iSize, float iRandomFillPercent, int iBuildingMaxHeight, int iSpaceBetweenRoads, std::string sSeed);
 
 
 
