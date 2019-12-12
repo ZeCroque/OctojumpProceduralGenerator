@@ -104,7 +104,7 @@ void MapGenerator::generateMap() {
 
     //DEBUG
     this->_iRandomFillPercent = 0.2;
-    this->_iBuildingMaxHeight = 10;
+    this->_iBuildingMaxHeight = 35;
     this->_iSpaceBetweenRoads = 4;
 
     this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.05);
