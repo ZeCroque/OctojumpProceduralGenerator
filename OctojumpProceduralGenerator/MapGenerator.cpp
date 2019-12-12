@@ -255,6 +255,10 @@ float MapGenerator::newRoad(int x, int y, int road_width, int direction) {
     int a, b;
     int tmp_iEndLine;
     int vertical;
+    float MinRoadSize = this->_fMinRoadSize;
+    float MaxRoadSize = this->_fMaxRoadSize;
+
+
     if (direction == 1 || direction == 3) {
         a = x;
         b = y;
@@ -264,11 +268,16 @@ float MapGenerator::newRoad(int x, int y, int road_width, int direction) {
         b = x;
         vertical = true;
     }
+    if (road_width == 0) {
+        MinRoadSize /= 2;
+        MaxRoadSize /= 2;
+    }
+
     if (direction == 1 || direction == 2) {
-        tmp_iEndLine = randInt(a + (int) (float(this->_iSize - a) * this->_fMinRoadSize),
-                               a + (int) (float(this->_iSize - a) * this->_fMaxRoadSize));
+        tmp_iEndLine = randInt(a + (int) (float(this->_iSize - a) * MinRoadSize),
+                               a + (int) (float(this->_iSize - a) * MaxRoadSize));
     } else {
-        tmp_iEndLine = a - randInt((int) ((float) a * this->_fMinRoadSize), (int) ((float) a * this->_fMaxRoadSize));
+        tmp_iEndLine = a - randInt((int) ((float) a * MinRoadSize), (int) ((float) a * MaxRoadSize));
     }
     int iEndLine = this->getIEndLine(tmp_iEndLine, a, b, vertical);
     a = this->getIEndLine(a, tmp_iEndLine, b, vertical);
