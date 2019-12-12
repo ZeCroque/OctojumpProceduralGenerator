@@ -2,4 +2,3 @@
 
 void RedirectIOToConsole();
 void clearConsole(char fill = ' ');
-void CloseConsole();

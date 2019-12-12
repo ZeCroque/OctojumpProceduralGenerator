@@ -8,7 +8,6 @@
 #include "Console.h"
 #include "IO.h"
 
-
 #define MAX_LOADSTRING 100
 
 using namespace std;
@@ -25,9 +24,16 @@ bool bScroll;
 SCROLLINFO si;
 
 //Data
+float fGreyScaleCoeff;
+
+bool lineDrawing = false;
+bool rectDrawing = false;
+int lastMouseX;
+int lastMouseY;
+
 int** iMap = nullptr;
 int iSize;
-float fGreyScaleCoeff;
+int currentColor;
 
 void readMapFromFile(LPWSTR path)
 {	
@@ -99,6 +105,10 @@ void drawRoads()
 				if (currentValue)
 				{
 					int greyScale = 255 - ((int)currentValue * fGreyScaleCoeff);
+					if (greyScale < 0)
+					{
+						greyScale = 0;
+					}
 					HBRUSH brush = CreateSolidBrush(RGB(greyScale, greyScale, greyScale));
 					rect = { x, y, x + 5, y + 5 };
 					FillRect(hdc, &rect, brush);
@@ -271,18 +281,138 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			int y = GET_Y_LPARAM(lParam)/5 + yCurrentScroll/5;
 			if (x < 150 && y < 150)
 			{
-				RedirectIOToConsole();
-				iMap[x][y]=readIntFromKB();
-				CloseConsole();
-			}
-			bScroll = true;
-			RECT clientRect;
-			GetClientRect(hWnd, &clientRect);
-			InvalidateRect(hWnd, &clientRect, true);
-
-			
+				if (!lineDrawing && !rectDrawing)
+				{
+					iMap[x][y] = currentColor;
+					bScroll = true;
+					RECT clientRect;
+					GetClientRect(hWnd, &clientRect);
+					InvalidateRect(hWnd, &clientRect, true);
+				}
+				else
+				{
+					lastMouseX = x;
+					lastMouseY = y;
+				}
+			}	
 			break;
 		}
+		case WM_LBUTTONUP:
+			if (lineDrawing)
+			{
+				int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
+				int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
+				if (lastMouseX == x)
+				{
+					if (lastMouseY < y)
+					{
+						int tmp = y;
+						y = lastMouseY;
+						lastMouseY = tmp;
+					}
+					for (int i = y; i <= lastMouseY; ++i)
+					{
+						iMap[x][i] = currentColor;
+					}
+					bScroll = true;
+					RECT clientRect;
+					GetClientRect(hWnd, &clientRect);
+					InvalidateRect(hWnd, &clientRect, true);
+				}
+				else if (lastMouseY == y)
+				{
+					if (lastMouseX < x)
+					{
+						int tmp = x;
+						x = lastMouseX;
+						lastMouseX = tmp;
+					}
+					for (int i = x; i <= lastMouseX; ++i)
+					{
+						iMap[i][y] = currentColor;
+					}
+					bScroll = true;
+					RECT clientRect;
+					GetClientRect(hWnd, &clientRect);
+					InvalidateRect(hWnd, &clientRect, true);
+				}
+				else
+				{
+					MessageBox(hWnd, L"Can't draw inclined line.", L"Error", 0);
+				}
+				lineDrawing = false;
+			}
+			else if (rectDrawing)
+			{
+				int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
+				int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
+				//TODO rect
+				if (lastMouseX < x)
+				{
+					int tmp = x;
+					x = lastMouseX;
+					lastMouseX = tmp;
+				}
+				if (lastMouseY < y)
+				{
+					int tmp = y;
+					y = lastMouseY;
+					lastMouseY = tmp;
+				}
+
+				for (int j = y; j <= lastMouseY; ++j)
+				{
+					for (int i = x; i <= lastMouseX; ++i)
+					{
+						iMap[i][j] = currentColor;
+					}
+				}
+
+				bScroll = true;
+				RECT clientRect;
+				GetClientRect(hWnd, &clientRect);
+				InvalidateRect(hWnd, &clientRect, true);
+				rectDrawing = false;
+			}
+			break;
+		case WM_RBUTTONDOWN:
+		{
+			int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
+			int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
+			if (x < 150 && y < 150)
+			{
+				currentColor = iMap[x][y];
+			}
+			break;
+		}
+		case WM_KEYDOWN:
+			switch (wParam)
+			{
+			case 0x43:
+				RedirectIOToConsole();
+				currentColor=readIntFromKB();
+				break;
+			case 0x53:
+				saveFile(readFilePath(), iMap, iSize);
+				break;
+			case VK_CONTROL:
+				rectDrawing = true;
+				break;
+			case VK_SHIFT:
+				lineDrawing = true;
+				break;
+			} 
+			break;
+		case WM_KEYUP:
+			switch (wParam)
+			{
+			case VK_SHIFT:		
+				lineDrawing = false;
+				break;
+			case VK_CONTROL:
+				rectDrawing = false;
+				break;
+			}
 		case WM_COMMAND:
 		{
 			int wmId = LOWORD(wParam);

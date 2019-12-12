@@ -51,26 +51,6 @@ void RedirectIOToConsole() {
 	std::cin.clear();
 }
 
-void CloseConsole()
-{
-	FreeConsole();
-	if (ConsoleOutput != NULL)
-	{
-		CloseHandle(ConsoleOutput);
-		ConsoleOutput = NULL;
-	}
-	if (ConsoleError != NULL)
-	{
-		CloseHandle(ConsoleError);
-		ConsoleError = NULL;
-	}
-	if (ConsoleInput != NULL)
-	{
-		CloseHandle(ConsoleInput);
-		ConsoleInput = NULL;
-	}
-}
-
 void clearConsole(char fill)
 {
 	COORD tl = { 0,0 };
