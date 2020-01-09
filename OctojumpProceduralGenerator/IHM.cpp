@@ -9,7 +9,7 @@ using namespace std;
 
 void writeDisclaimer()
 {
-	cout << "You are currently running Octojump_Procedural test program. Copyright (C) 2019 Gaëtan Croquefer" << endl << endl;
+	cout << "You are currently running Octojump_Procedural test program. Copyright (C) 2019 Gaï¿½tan Croquefer" << endl << endl;
 }
 
 void writeTitle(string s)
@@ -124,12 +124,12 @@ void debug()
 		switch (iUsrChoice)
 		{
 		case 0:
-			mg = new MapGenerator(iSize, 50, 35, 4);
+			mg = new MapGenerator(iSize, 60, 35, 4);
 			break;
 		case 1:
 			cout << "Please enter your seed:" << endl;
 			cin >> sUsrSeed;
-			mg = new MapGenerator(iSize, 50, 35, 4, sUsrSeed);
+			mg = new MapGenerator(iSize, 60, 35, 4, sUsrSeed);
 			break;
 		}
 		mg->generateMap();

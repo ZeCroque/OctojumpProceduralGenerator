@@ -43,9 +43,10 @@ MapGenerator &MapGenerator::operator=(const MapGenerator &mg) {
 /*======================================
 ========CONSTRUCTEURS SURCHARGES========
 ========================================*/
-MapGenerator::MapGenerator(int iSize, float iRandomFillPercent, int iBuildingMaxHeight, int iSpaceBetweenRoads ) : _iSize(iSize),
-                                                                  _iRandomFillPercent(iRandomFillPercent), _iBuildingMaxHeight(iBuildingMaxHeight),
-																	_iSpaceBetweenRoads(iSpaceBetweenRoads), _sSeed(string()), _bUseRandomSeed(true) {
+MapGenerator::MapGenerator(int iSize, float iRandomFillPercent, int iBuildingMaxHeight, int iSpaceBetweenRoads)
+        : _iSize(iSize),
+          _iRandomFillPercent(iRandomFillPercent), _iBuildingMaxHeight(iBuildingMaxHeight),
+          _iSpaceBetweenRoads(iSpaceBetweenRoads), _sSeed(string()), _bUseRandomSeed(true) {
     this->_iMap = new int *[_iSize];
     for (int i = 0; i < _iSize; ++i) {
         this->_iMap[i] = new int[_iSize];
@@ -63,8 +64,10 @@ MapGenerator::MapGenerator(int iSize, float iRandomFillPercent, int iBuildingMax
     }
 }
 
-MapGenerator::MapGenerator(int iSize, float iRandomFillPercent, int iBuildingMaxHeight, int iSpaceBetweenRoads, std::string sSeed) : MapGenerator(iSize,
-                                                                                                  iRandomFillPercent, iBuildingMaxHeight, iSpaceBetweenRoads) {
+MapGenerator::MapGenerator(int iSize, float iRandomFillPercent, int iBuildingMaxHeight, int iSpaceBetweenRoads,
+                           std::string sSeed) : MapGenerator(iSize,
+                                                             iRandomFillPercent, iBuildingMaxHeight,
+                                                             iSpaceBetweenRoads) {
     this->_bUseRandomSeed = false;
     this->_sSeed = std::move(sSeed);
 }
@@ -107,19 +110,19 @@ void MapGenerator::generateMap() {
     std::seed_seq seed(this->_sSeed.begin(), this->_sSeed.end());
     this->_generator = new std::mt19937(seed);
 
-	/*
+    /*
     //DEBUG
     this->_iRandomFillPercent = 0.2;
     this->_iBuildingMaxHeight = 35;
     this->_iSpaceBetweenRoads = 4;
-	*/
+    */
 
     this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.05);
     this->_fMinRoadSize = 0.60; // 60
     this->_fMaxRoadSize = 0.90; // 90
 
 
-    for (float i = 0; i < this->_iRandomFillPercent * (float) this->_iSize;) {
+    for (float i = 0; i < (this->_iRandomFillPercent / 100) * (float) this->_iSize;) {
         i += this->newCrossline();
     }//TODO make setting
 
