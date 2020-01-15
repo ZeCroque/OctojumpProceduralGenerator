@@ -92,11 +92,6 @@ int MapGenerator::randInt(int min, int max) {
 /*======================================
 =============INITIALIZER===========
 ========================================*/
-/*
-	this->_iRandomFillPercent = 0.2;
-	this->_iBuildingMaxHeight = 35;
-	this->_iSpaceBetweenRoads = 4;
-*/
 void MapGenerator::generateMap() {
     if (this->_bUseRandomSeed) {
         char tmp[80] = {0};
@@ -118,13 +113,13 @@ void MapGenerator::generateMap() {
     */
 
     this->_iMinSpaceFromBorder = (int) (this->_iSize * 0.05);
-    this->_fMinRoadSize = 0.60; // 60
-    this->_fMaxRoadSize = 0.90; // 90
+    this->_fMinRoadSize = 0.60;
+    this->_fMaxRoadSize = 0.90;
 
 
     for (float i = 0; i < (this->_iRandomFillPercent / 100) * (float) this->_iSize;) {
         i += this->newCrossline();
-    }//TODO make setting
+    }
 
     for (int x = 0; x < this->_iSize; x++) {
         for (int y = 0; y < this->_iSize; ++y) {
@@ -374,7 +369,6 @@ void MapGenerator::placeBuildings() {
             }
         }
     } while (bSquareFound);
-    // printMap();
 }
 
 Rectangle MapGenerator::findSquare(int x, int y) {
@@ -412,30 +406,4 @@ void MapGenerator::fillRectangle(const Rectangle &rect) {
                                         (int(this->_iHeatMap[x][y]) + randInt(-2, 2))) / 4);
         }
     }
-
-
 }
-
-/*======================================
-==================DEBUG=================
-========================================*/
-//void MapGenerator::printMap() {
-//    clearConsole();
-//
-//    for (int j = 0; j < this->_iSize; ++j) {
-//        for (int i = 0; i < this->_iSize; ++i) {
-//
-//
-//            if (this->_iMap[i][j] == 0) {
-//                setConsoleColor(1);
-//            } else if (this->_iMap[i][j] > 0) {
-//                setConsoleColor(4);
-//            }
-//
-//            cout << this->_iMap[i][j] << " ";
-//        }
-//        cout << endl;
-//    }
-//    setConsoleColor(15);
-//}
-
