@@ -40,7 +40,7 @@ public:
     void generateMap();
 
     //TOOLS
-    void MakeHeatMap();
+    void MakeHeatMap(int a, int b);
 
     //ROADS GENERATION
     float newCrossline();

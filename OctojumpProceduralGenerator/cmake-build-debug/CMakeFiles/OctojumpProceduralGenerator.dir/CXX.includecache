@@ -6,28 +6,30 @@
 
 #IncludeRegexTransform: 
 
-D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/IHM.cpp
+D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/IHM.h
+MapGenerator.h
+D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/MapGenerator.h
+
+D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/MapGenerator.cpp
 pch.h
 D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/pch.h
-IHM.h
-D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/IHM.h
-IO.h
-D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/IO.h
 MapGenerator.h
 D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/MapGenerator.h
+ctime
+-
+string
+-
+algorithm
+-
 iostream
 -
-string
+utility
 -
-
+IHM.h
 D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/IHM.h
-MapGenerator.h
-D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/MapGenerator.h
-
-D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/IO.h
-shobjidl_core.h
--
-string
+Rectangle.h
+D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/Rectangle.h
+random
 -
 
 D:/CLionProject/OctojumpProceduralGenerator/OctojumpProceduralGenerator/MapGenerator.h
