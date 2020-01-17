@@ -141,7 +141,7 @@ void MapGenerator::generateMap() {
 
     int a = this->_iSize / 2;
     int b = this->_iSize / 2;
-    for (int i = 0; i < 2; i++) {
+    for (int i = 0; i < 1; i++) {
         this->MakeHeatMap(a, b);
         a = this->randInt(int(this->_iSize * 0.15), (this->_iSize - int(this->_iSize * 0.15))) - 1;
         b = this->randInt(int(this->_iSize * 0.15), (this->_iSize - int(this->_iSize * 0.15))) - 1;
@@ -164,17 +164,24 @@ void MapGenerator::MakeHeatMap(int a, int b) {
     float max_distance = min({distPoint(a, b, 0, 0), distPoint(a, b, 0, this->_iSize), distPoint(a, b, this->_iSize, 0),
                               distPoint(a, b, this->_iSize, this->_iSize)});
 
+
+    for (int x = 0; x < this->_iSize; ++x) {
+        for (int y = 0; y < this->_iSize; ++y) {
+            auto rand = this->randInt(-int(this->_iBuildingMaxHeight * 0.10), int(this->_iBuildingMaxHeight * 0.10));
+            this->_iHeatMap[x][y] = float(this->_iBuildingMaxHeight * 0.10) + rand;
+            //cout << float(this->_iBuildingMaxHeight * 0.50) + rand << endl;
+        }
+    }
+
     float heat;
     for (int x = 0; x < this->_iSize; ++x) {
         for (int y = 0; y < this->_iSize; ++y) {
-            heat = abs((((float) this->_iBuildingMaxHeight * distPoint(a, b, x, y)) / max_distance) -
-                       (float) this->_iBuildingMaxHeight);
-            if (this->_iHeatMap[x][y] == -1) {
-                this->_iHeatMap[x][y] = fmax(1, heat);
-            } else {
-                this->_iHeatMap[x][y] = float((this->_iHeatMap[x][y] * 2) + fmax(1, heat)) / 3;
+            heat = abs((((float) (this->_iBuildingMaxHeight * 0.50) * distPoint(a, b, x, y)) / (max_distance)) -
+                       (float) (this->_iBuildingMaxHeight * 0.50));
+            //cout << heat << endl;
+            if (heat > 0) {
+                this->_iHeatMap[x][y] += heat;
             }
-
         }
     }
 }
@@ -404,9 +411,9 @@ void MapGenerator::fillRectangle(const Rectangle &rect) {
 
     for (int y = rect._yOrigin; y < rect._yEnd; ++y) {
         for (int x = rect._xOrigin; x < rect._xEnd; ++x) {
-            this->_iMap[x][y] = max(1, (int(heat) * 2 +
-                                        int(this->_iHeatMap[x][y]) +
-                                        (int(this->_iHeatMap[x][y]) + randInt(-10, 10))) / 4);
+            this->_iMap[x][y] = int(this->_iHeatMap[x][y]); //max(1, (int(heat) * 2 +
+//                                        int(this->_iHeatMap[x][y]) +
+//                                        (int(this->_iHeatMap[x][y]) + randInt(-10, 10))) / 4);
         }
     }
 }
