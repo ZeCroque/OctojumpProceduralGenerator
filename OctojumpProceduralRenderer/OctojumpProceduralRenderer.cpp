@@ -279,7 +279,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			int x = GET_X_LPARAM(lParam)/5 + xCurrentScroll/5;
 			int y = GET_Y_LPARAM(lParam)/5 + yCurrentScroll/5;
-			if (x < 150 && y < 150)
+			if (x < iSize && y < iSize)
 			{
 				if (!lineDrawing && !rectDrawing)
 				{
@@ -346,7 +346,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			{
 				int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
 				int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
-				//TODO rect
+				
 				if (lastMouseX < x)
 				{
 					int tmp = x;
@@ -379,7 +379,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
 			int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
-			if (x < 150 && y < 150)
+			if (x < iSize && y < iSize)
 			{
 				currentColor = iMap[x][y];
 			}
