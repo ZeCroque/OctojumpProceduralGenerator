@@ -336,7 +336,7 @@ float MapGenerator::newCrossline() {
     float iCrossroadCounts = 0;
 
     int stack[4] = {1, 2, 3, 4};
-    int trash[4];
+	int trash[4] = { 0 };
     int rnd;
     bool tmp;
 

@@ -197,111 +197,114 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
-		case WM_CREATE:
+	case WM_CREATE:
+	{
+		xCurrentScroll = 0;
+		yCurrentScroll = 0;
+		bScroll = true;
+
+		break;
+	}
+	case WM_SIZE:
+	{
+		xMaxScroll = max(iSize * 5 - (LOWORD(lParam) - LOWORD(lParam) % 5), 0);
+		yMaxScroll = max(iSize * 5 - (HIWORD(lParam) - HIWORD(lParam) % 5), 0);
+
+		si.cbSize = sizeof(si);
+		si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
+		si.nMin = 0;
+		si.nPage = 5;
+
+		si.nPos = xCurrentScroll;
+		si.nMax = xMaxScroll;
+		SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+
+		if (si.nMax)
 		{
-			xCurrentScroll = 0;
-			yCurrentScroll = 0;
+			bScroll = false;
+		}
+
+		si.nPos = yCurrentScroll;
+		si.nMax = yMaxScroll;
+		SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+
+		if (si.nMax)
+		{
+			bScroll = true;
+		}
+
+		break;
+	}
+	case WM_HSCROLL:
+	{
+		int delta = calculateScroll(xCurrentScroll, xMaxScroll, wParam);
+
+		if (delta != 0)
+		{
 			bScroll = true;
 
-			break;
-		}
-		case WM_SIZE:
-		{
-			xMaxScroll = max(iSize * 5 - (LOWORD(lParam) - LOWORD(lParam) % 5), 0);
-			yMaxScroll = max(iSize * 5 - (HIWORD(lParam) - HIWORD(lParam) % 5), 0);
+			// Scroll the window.
+			ScrollWindowEx(hWnd, delta, 0, nullptr, nullptr, nullptr, nullptr, SW_INVALIDATE | SW_ERASE);
+			UpdateWindow(hWnd);
 
+			// Reset the scroll bar. 
 			si.cbSize = sizeof(si);
-			si.fMask = SIF_RANGE | SIF_PAGE | SIF_POS;
-			si.nMin = 0;
-			si.nPage = 5;
-
+			si.fMask = SIF_POS;
 			si.nPos = xCurrentScroll;
-			si.nMax = xMaxScroll;
 			SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+		}
+		break;
+	}
+	case WM_VSCROLL:
+	{
+		int delta = calculateScroll(yCurrentScroll, yMaxScroll, wParam);
 
-			if (si.nMax)
-			{
-				bScroll = false;
-			}
+		if (delta != 0)
+		{
+			bScroll = true;
 
+			// Scroll the window.
+			ScrollWindowEx(hWnd, 0, delta, nullptr, nullptr, nullptr, nullptr, SW_INVALIDATE | SW_ERASE);
+			UpdateWindow(hWnd);
+
+			// Reset the scroll bar. 
+			si.cbSize = sizeof(si);
+			si.fMask = SIF_POS;
 			si.nPos = yCurrentScroll;
-			si.nMax = yMaxScroll;
 			SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
-
-			if (si.nMax)
-			{
-				bScroll = true;
-			}
-
-			break;
 		}
-		case WM_HSCROLL:
+		break;
+	}
+	case WM_LBUTTONDOWN:
+	{
+		int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
+		int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
+		if (x < iSize && y < iSize)
 		{
-			int delta = calculateScroll(xCurrentScroll, xMaxScroll, wParam);
-
-			if (delta != 0)
+			if (!lineDrawing && !rectDrawing)
 			{
+				iMap[x][y] = currentColor;
 				bScroll = true;
-
-				// Scroll the window.
-				ScrollWindowEx(hWnd, delta, 0, nullptr, nullptr, nullptr, nullptr, SW_INVALIDATE | SW_ERASE);
-				UpdateWindow(hWnd);
-
-				// Reset the scroll bar. 
-				si.cbSize = sizeof(si);
-				si.fMask = SIF_POS;
-				si.nPos = xCurrentScroll;
-				SetScrollInfo(hWnd, SB_HORZ, &si, TRUE);
+				RECT clientRect;
+				GetClientRect(hWnd, &clientRect);
+				InvalidateRect(hWnd, &clientRect, true);
 			}
-			break;
-		}
-		case WM_VSCROLL:
-		{
-			int delta = calculateScroll(yCurrentScroll, yMaxScroll, wParam);
-
-			if (delta != 0)
+			else
 			{
-				bScroll = true;
-
-				// Scroll the window.
-				ScrollWindowEx(hWnd, 0, delta, nullptr, nullptr, nullptr, nullptr, SW_INVALIDATE | SW_ERASE);
-				UpdateWindow(hWnd);
-
-				// Reset the scroll bar. 
-				si.cbSize = sizeof(si);
-				si.fMask = SIF_POS;
-				si.nPos = yCurrentScroll;
-				SetScrollInfo(hWnd, SB_VERT, &si, TRUE);
+				lastMouseX = x;
+				lastMouseY = y;
 			}
-			break;
 		}
-		case WM_LBUTTONDOWN:
+		break;
+	}
+	case WM_LBUTTONUP:
+	{
+		int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
+		int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
+		if (x < iSize && y < iSize)
 		{
-			int x = GET_X_LPARAM(lParam)/5 + xCurrentScroll/5;
-			int y = GET_Y_LPARAM(lParam)/5 + yCurrentScroll/5;
-			if (x < iSize && y < iSize)
-			{
-				if (!lineDrawing && !rectDrawing)
-				{
-					iMap[x][y] = currentColor;
-					bScroll = true;
-					RECT clientRect;
-					GetClientRect(hWnd, &clientRect);
-					InvalidateRect(hWnd, &clientRect, true);
-				}
-				else
-				{
-					lastMouseX = x;
-					lastMouseY = y;
-				}
-			}	
-			break;
-		}
-		case WM_LBUTTONUP:
 			if (lineDrawing)
 			{
-				int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
-				int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
 				if (lastMouseX == x)
 				{
 					if (lastMouseY < y)
@@ -344,9 +347,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			else if (rectDrawing)
 			{
-				int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
-				int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
-				
 				if (lastMouseX < x)
 				{
 					int tmp = x;
@@ -374,65 +374,71 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 				InvalidateRect(hWnd, &clientRect, true);
 				rectDrawing = false;
 			}
-			break;
-		case WM_RBUTTONDOWN:
-		{
-			int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
-			int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
-			if (x < iSize && y < iSize)
-			{
-				currentColor = iMap[x][y];
-			}
-			break;
 		}
-		case WM_KEYDOWN:
-			switch (wParam)
-			{
-			case 0x43:
-				RedirectIOToConsole();
-				currentColor=readIntFromKB();
-				break;
-			case 0x53:
-				saveFile(readFilePath(), iMap, iSize);
-				break;
-			case VK_CONTROL:
-				rectDrawing = true;
-				break;
-			case VK_SHIFT:
-				lineDrawing = true;
-				break;
-			} 
-			break;
-		case WM_KEYUP:
-			switch (wParam)
-			{
-			case VK_SHIFT:		
-				lineDrawing = false;
-				break;
-			case VK_CONTROL:
-				rectDrawing = false;
-				break;
-			}
-		case WM_COMMAND:
+		else
 		{
-			int wmId = LOWORD(wParam);
-			// Analyse les sélections de menu :
-			if (wmId == IDM_EXIT)
-			{
-				DestroyWindow(hWnd);
-			}
-			else
-			{
-				return DefWindowProc(hWnd, message, wParam, lParam);
-			}
+			MessageBox(hWnd, L"Can't draw outside the map area.", L"Error", 0);
+		}
+	}
+	break;
+	case WM_RBUTTONDOWN:
+	{
+		int x = GET_X_LPARAM(lParam) / 5 + xCurrentScroll / 5;
+		int y = GET_Y_LPARAM(lParam) / 5 + yCurrentScroll / 5;
+		if (x < iSize && y < iSize)
+		{
+			currentColor = iMap[x][y];
 		}
 		break;
-		case WM_PAINT:
-			drawRoads();
+	}
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case 0x43:
+			RedirectIOToConsole();
+			currentColor=readIntFromKB();
 			break;
-		case WM_DESTROY:
-			PostQuitMessage(0);
+		case 0x53:
+			saveFile(readFilePath(), iMap, iSize);
 			break;
+		case VK_CONTROL:
+			rectDrawing = true;
+			break;
+		case VK_SHIFT:
+			lineDrawing = true;
+			break;
+		} 
+		break;
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case VK_SHIFT:		
+			lineDrawing = false;
+			break;
+		case VK_CONTROL:
+			rectDrawing = false;
+			break;
+		}
+	case WM_COMMAND:
+	{
+		int wmId = LOWORD(wParam);
+		// Analyse les sélections de menu :
+		if (wmId == IDM_EXIT)
+		{
+			DestroyWindow(hWnd);
+		}
+		else
+		{
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
+	}
+	break;
+	case WM_PAINT:
+		drawRoads();
+		break;
+	case WM_DESTROY:
+		PostQuitMessage(0);
+		break;
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
